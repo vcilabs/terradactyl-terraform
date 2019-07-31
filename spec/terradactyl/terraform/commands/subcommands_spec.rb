@@ -347,5 +347,56 @@ RSpec.describe Terradactyl::Terraform::Commands do
       end
     end
   end
-end
 
+  describe Terradactyl::Terraform::Commands::Validate do
+    let(:options) do
+      @options.new({
+        quiet: true,
+      })
+    end
+
+    let(:command) do
+      described_class.execute(dir_or_plan: @stack_dir, options: options)
+    end
+
+    context 'when the stack is initialized' do
+      describe '.execute' do
+        it 'validates the stack' do
+          expect(command).to eq(0)
+        end
+      end
+    end
+
+    context 'when the stack is uninitialized' do
+      before(:each) do
+        @artifacts.each_pair { |_k,v| FileUtils.rm_rf(v) if File.exist?(v) }
+      end
+
+      describe '.execute' do
+        it 'fails to validate the stack' do
+          silence {
+            expect(command).to eq(1)
+          }
+        end
+      end
+    end
+  end
+
+  describe Terradactyl::Terraform::Commands::Checklist do
+    let(:options) do
+      @options.new({
+        quiet: true,
+      })
+    end
+
+    let(:command) do
+      described_class.execute(dir_or_plan: @stack_dir, options: options)
+    end
+
+    describe '.execute' do
+      it 'performs a Terraform upgrade readiness check' do
+        expect(command).to eq(0)
+      end
+    end
+  end
+end
