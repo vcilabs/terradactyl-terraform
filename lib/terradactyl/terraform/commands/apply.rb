@@ -2,8 +2,8 @@
 
 module Terradactyl
   module Terraform
-    module Commands
-      class Apply < Base
+    module Rev011
+      module Apply
         def defaults
           {
             'backup'       => nil,
@@ -11,7 +11,7 @@ module Terradactyl
             'lock'         => true,
             'lock-timeout' => '0s',
             'input'        => true,
-            'no-color'     => true,
+            'no-color'     => false,
             'parallelism'  => 10,
             'refresh'      => true,
             'state'        => 'terraform.tfstate',
@@ -28,6 +28,17 @@ module Terradactyl
             no-color
           ]
         end
+      end
+    end
+
+    module Rev012
+      module Apply
+        include Rev011::Apply
+      end
+    end
+
+    module Commands
+      class Apply < Base
       end
     end
   end

@@ -2,8 +2,8 @@
 
 module Terradactyl
   module Terraform
-    module Commands
-      class Plan < Base
+    module Rev011
+      module Plan
         def defaults
           {
             'destroy'           => false,
@@ -12,7 +12,7 @@ module Terradactyl
             'lock'              => true,
             'lock-timeout'      => '0s',
             'module-depth'      => -1,
-            'no-color'          => true,
+            'no-color'          => false,
             'out'               => nil,
             'parallelism'       => 10,
             'refresh'           => true,
@@ -30,6 +30,17 @@ module Terradactyl
             no-color
           ]
         end
+      end
+    end
+
+    module Rev012
+      module Plan
+        include Rev011::Plan
+      end
+    end
+
+    module Commands
+      class Plan < Base
       end
     end
   end

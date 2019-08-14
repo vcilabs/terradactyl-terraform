@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'version_manager/options'
+require_relative 'version_manager/defaults'
 require_relative 'version_manager/downloader'
 require_relative 'version_manager/package'
 require_relative 'version_manager/binary'
@@ -26,7 +26,7 @@ module Terradactyl
         attr_writer :options
 
         def options
-          @options ||= Options.new
+          @options ||= Defaults.load
           block_given? ? yield(@options) : @options
         end
 
@@ -74,10 +74,6 @@ module Terradactyl
           (inventory.select do |semver|
             Gem::Version.new(semver) >= Gem::Version.new(minimum)
           end).any?
-        end
-
-        def search
-          list.first || 'terraform'
         end
 
         private

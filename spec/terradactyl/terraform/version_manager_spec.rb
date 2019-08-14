@@ -100,7 +100,7 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
         end
       end
 
-      describe '#search' do
+      describe '#binary' do
         context 'when none are installed' do
           before do
             @temp_dir = Dir.mktmpdir('terradactyl')
@@ -115,13 +115,13 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
           end
 
           it 'returns forces terraform lookup on $PATH' do
-            expect(subject.search).to eq('terraform')
+            expect(subject.binary).to eq('terraform')
           end
         end
 
         context 'when none are installed' do
-          it 'returns first result from install dir' do
-            expect(subject.search).to eq(subject.inventory(test_versions.first))
+          it 'returns most recent version from install dir' do
+            expect(subject.binary).to eq(subject.inventory(test_versions.last))
           end
         end
       end
