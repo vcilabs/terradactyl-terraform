@@ -51,11 +51,11 @@ module Terradactyl
         end
 
         def list
-          Dir.glob("#{install_dir}/terraform-*")
+          managed_binaries
         end
 
         def inventory(semver = nil)
-          @inventory = list.each_with_object({}) do |path, memo|
+          @inventory = managed_binaries.each_with_object({}) do |path, memo|
             match = File.basename(path).match(inventory_name_re)['version']
             memo[match] = path
           end
@@ -67,7 +67,7 @@ module Terradactyl
         end
 
         def any?
-          list.any?
+          managed_binaries.any?
         end
 
         def minimum?
