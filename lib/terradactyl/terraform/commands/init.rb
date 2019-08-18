@@ -2,8 +2,8 @@
 
 module Terradactyl
   module Terraform
-    module Commands
-      class Init < Base
+    module Rev011
+      module Init
         def defaults
           {
             'backend'        => true,
@@ -30,6 +30,17 @@ module Terradactyl
             reconfigure
           ]
         end
+      end
+    end
+
+    module Rev012
+      module Init
+        include Rev011::Init
+      end
+    end
+
+    module Commands
+      class Init < Base
       end
     end
   end

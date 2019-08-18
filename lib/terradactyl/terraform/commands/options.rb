@@ -11,7 +11,7 @@ module Terradactyl
 
         def defaults
           {
-            binary: VersionManager.search,
+            binary: VersionManager.binary,
             version: nil,
             autoinstall: false,
             install_dir: nil,

@@ -2,8 +2,8 @@
 
 module Terradactyl
   module Terraform
-    module Commands
-      class Fmt < Base
+    module Rev011
+      module Fmt
         def defaults
           {
             'list'  => true,
@@ -16,6 +16,17 @@ module Terradactyl
         def switches
           []
         end
+      end
+    end
+
+    module Rev012
+      module Fmt
+        include Rev011::Fmt
+      end
+    end
+
+    module Commands
+      class Fmt < Base
       end
     end
   end

@@ -2,15 +2,15 @@
 
 module Terradactyl
   module Terraform
-    module Commands
-      class Refresh < Base
+    module Rev011
+      module Refresh
         def defaults
           {
             'backup'       => nil,
             'input'        => true,
             'lock'         => true,
             'lock-timeout' => '0s',
-            'no-color'     => true,
+            'no-color'     => false,
             'state'        => 'terraform.tfstate',
             'state-out'    => nil,
             # 'target'      => [], # not implemented
@@ -24,6 +24,17 @@ module Terradactyl
             no-color
           ]
         end
+      end
+    end
+
+    module Rev012
+      module Refresh
+        include Rev011::Refresh
+      end
+    end
+
+    module Commands
+      class Refresh < Base
       end
     end
   end

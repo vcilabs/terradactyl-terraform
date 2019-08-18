@@ -1,23 +1,33 @@
 require 'spec_helper'
 
-RSpec.describe Terradactyl::Terraform::VersionManager::Options do
+RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
   after(:each) do
     subject.reset!
   end
 
+  let(:binary) do
+    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_BINARY
+  end
+
   let(:install_dir) do
-    Terradactyl::Terraform::VersionManager::Options::DEFAULT_INSTALL_DIR
+    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_INSTALL_DIR
   end
 
   let(:downloads_url) do
-    Terradactyl::Terraform::VersionManager::Options::DEFAULT_DOWNLOADS_URL
+    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_DOWNLOADS_URL
   end
 
   let(:releases_url) do
-    Terradactyl::Terraform::VersionManager::Options::DEFAULT_RELEASES_URL
+    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_RELEASES_URL
   end
 
   context 'simple initialization' do
+    describe '#binary' do
+      it 'returns the default value' do
+        expect(subject.binary).to eq(binary)
+      end
+    end
+
     describe '#install_dir' do
       it 'returns the default value' do
         expect(subject.install_dir).to eq(install_dir)
@@ -50,6 +60,26 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Options do
   end
 
   context 'provides nil-safe defaults' do
+    describe '#binary=' do
+      it 'ignores empty values' do
+        subject.binary = ''
+        expect(subject.binary).to eq(binary)
+      end
+      it 'ignores nil values' do
+        subject.binary = nil
+        expect(subject.binary).to eq(binary)
+      end
+      it 'ignores invalid path values' do
+        subject.binary = 'some/fake/path'
+        expect(subject.binary).to eq(binary)
+      end
+      it 'expands valid path values' do
+        subject.install_dir = '~/'
+        expect(subject.install_dir).not_to eq('~/')
+        expect(subject.install_dir).to eq(File.expand_path('~/'))
+      end
+    end
+
     describe '#install_dir=' do
       it 'ignores empty values' do
         subject.install_dir = ''

@@ -2,8 +2,8 @@
 
 module Terradactyl
   module Terraform
-    module Commands
-      class Show < Base
+    module Rev011
+      module Show
         def defaults
           {
             'module-depth' => -1,
@@ -16,6 +16,17 @@ module Terradactyl
             no-color
           ]
         end
+      end
+    end
+
+    module Rev012
+      module Show
+        include Rev011::Show
+      end
+    end
+
+    module Commands
+      class Show < Base
       end
     end
   end

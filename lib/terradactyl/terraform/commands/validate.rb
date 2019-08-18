@@ -2,12 +2,12 @@
 
 module Terradactyl
   module Terraform
-    module Commands
-      class Validate < Base
+    module Rev011
+      module Validate
         def defaults
           {
             'check-variables' => true,
-            'no-color'        => true,
+            'no-color'        => false,
             # 'var'             => [], # not implemented
             'var-file'        => nil,
           }
@@ -18,6 +18,17 @@ module Terradactyl
             no-color
           ]
         end
+      end
+    end
+
+    module Rev012
+      module Validate
+        include Rev011::Validate
+      end
+    end
+
+    module Commands
+      class Validate < Base
       end
     end
   end

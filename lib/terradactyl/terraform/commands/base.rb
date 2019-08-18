@@ -2,6 +2,20 @@
 
 module Terradactyl
   module Terraform
+    class << self
+      def revision(version)
+        version ? ['Rev', *version.split('.').take(2)].join : 'Rev011'
+      end
+
+      def select_revision(version, klass)
+        klass_name = klass.name.split('::').last
+        const_name = "#{revision(version)}::#{klass_name}"
+        unless klass_name == 'Base'
+          klass.send(:include, Terradactyl::Terraform.const_get(const_name))
+        end
+      end
+    end
+
     module Commands
       class Base
         def self.execute(dir_or_plan: nil, options: nil, capture: false)
@@ -14,6 +28,7 @@ module Terradactyl
         def initialize(dir_or_plan: nil, options: nil)
           @dir_or_plan = dir_or_plan.to_s
           @options     = options || Options.new
+          Terradactyl::Terraform.select_revision(@options.version, self.class)
           inject_env_vars
         end
 
@@ -152,7 +167,7 @@ module Terradactyl
 
         def subcmd
           sig = self.class.name.split('::').last.downcase
-          sig == 'command' ? '' : sig
+          sig == 'base' ? '' : sig
         end
       end
     end

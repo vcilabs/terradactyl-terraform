@@ -2,8 +2,8 @@
 
 module Terradactyl
   module Terraform
-    module Commands
-      class Destroy < Base
+    module Rev011
+      module Destroy
         def defaults
           {
             'backup'       => nil,
@@ -11,7 +11,7 @@ module Terradactyl
             'force'        => false,
             'lock'         => true,
             'lock-timeout' => '0s',
-            'no-color'     => true,
+            'no-color'     => false,
             'parallelism'  => 10,
             'refresh'      => true,
             'state'        => 'terraform.tfstate',
@@ -29,6 +29,17 @@ module Terradactyl
             no-color
           ]
         end
+      end
+    end
+
+    module Rev012
+      module Destroy
+        include Rev011::Destroy
+      end
+    end
+
+    module Commands
+      class Destroy < Base
       end
     end
   end
