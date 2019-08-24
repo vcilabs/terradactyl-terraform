@@ -1,25 +1,184 @@
 require 'spec_helper'
 
 RSpec.describe Terradactyl::Terraform::VersionManager do
-
   before(:all) do
-    @install_dir = Terradactyl::Terraform::VersionManager.install_dir
-    Dir.glob("#{@install_dir}/terraform-*").each do |path|
-      FileUtils.rm path
+    @install_dir   = Terradactyl::Terraform::VersionManager.install_dir
+    @test_versions = %w[0.11.14 0.12.2]
+    @test_binaries = @test_versions.map { |v| "#{@install_dir}/terraform-#{v}" }
+  end
+
+  let(:install_dir) { @install_dir }
+
+  let(:install_error) do
+    Terradactyl::Terraform::VersionManager::VersionManagerError
+  end
+
+  let(:install_error_msg) do
+    Terradactyl::Terraform::VersionManager::ERROR_MISSING
+  end
+
+  let(:inventory_error) do
+    Terradactyl::Terraform::VersionManager::InventoryError
+  end
+
+  let(:inventory_error_missing) do
+    Terradactyl::Terraform::VersionManager::Inventory::ERROR_VERSION_MISSING
+  end
+
+  let(:test_versions) { @test_versions }
+  let(:test_binaries) { @test_binaries }
+
+  let(:install_dir) do
+    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_INSTALL_DIR
+  end
+
+  let(:downloads_url) do
+    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_DOWNLOADS_URL
+  end
+
+  let(:releases_url) do
+    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_RELEASES_URL
+  end
+
+  describe '#latest' do
+    it 'returns the very latest version of Terraform' do
+      expect(subject.latest).to match(/\d\.\d{2}\.\d/)
     end
   end
 
-  after(:all) do
-    Dir.glob("#{@install_dir}/terraform-*").each do |path|
-      FileUtils.rm path
+  context 'management' do
+    context 'when NONE installed' do
+      before(:all) do
+        Terradactyl::Terraform::VersionManager.reset!
+        @test_binaries.each { |path| FileUtils.rm_rf path }
+      end
+
+      after(:all) do
+        Terradactyl::Terraform::VersionManager.reset!
+        @test_binaries.each { |path| FileUtils.rm_rf path }
+      end
+
+      describe '#install' do
+        after(:each) do
+          Terradactyl::Terraform::VersionManager.reset!
+          @test_binaries.each { |path| FileUtils.rm_rf path }
+        end
+
+        context 'when no version is specified' do
+          let(:semver) { '0.11.14' }
+
+          it 'installs the default version' do
+            Terradactyl::Terraform::VersionManager.version = semver
+            expect(subject.install).to be_truthy
+            expect(File.exist?(subject[semver])).to be_truthy
+            expect(File.stat(subject[semver]).mode).to eq(33261)
+            cmd_output =`#{subject[semver]}`
+            exit_code  = $?.exitstatus
+            expect(cmd_output).to match(/Usage: terraform/)
+            expect(exit_code).to eq(127)
+          end
+        end
+
+        context 'when a version is specified' do
+          it 'installs the specified version of Terraform' do
+            test_versions.each do |semver|
+              expect(subject.install(semver)).to be_truthy
+              expect(File.exist?(subject[semver])).to be_truthy
+              expect(File.stat(subject[semver]).mode).to eq(33261)
+              cmd_output =`#{subject[semver]}`
+              exit_code  = $?.exitstatus
+              expect(cmd_output).to match(/Usage: terraform/)
+              expect(exit_code).to eq(127)
+            end
+          end
+        end
+      end
+
+      describe '#binary' do
+        it 'raises an exception' do
+          expect { subject.binary }.to raise_error(
+            install_error, /#{install_error_msg}/)
+        end
+      end
+
+      describe '#remove' do
+        it 'returns false for a specified version of Terraform' do
+          test_versions.each do |semver|
+            expect(subject.remove(semver)).to be_falsey
+          end
+        end
+      end
     end
-    described_class.reset!
+
+    context 'when SOME installed' do
+      before(:all) do
+        Terradactyl::Terraform::VersionManager.reset!
+        @test_versions.each do |semver|
+          Terradactyl::Terraform::VersionManager.install(semver)
+        end
+      end
+
+      after(:all) do
+        Terradactyl::Terraform::VersionManager.reset!
+      end
+
+      describe '#binary' do
+        context 'when version is NOT selected' do
+          it 'returns the latest binary in inventory' do
+            expect(subject.binary).to eq(test_binaries.last)
+          end
+        end
+
+        context 'when version is selected' do
+          context 'when version is available' do
+            it 'returns the specified version binary' do
+              Terradactyl::Terraform::VersionManager.version = test_versions.first
+              expect(subject.binary).to eq(test_binaries.first)
+            end
+          end
+
+          context 'when version is NOT available' do
+            it 'raises an exception' do
+              Terradactyl::Terraform::VersionManager.version = '0.0.0'
+              expect { subject.binary }.to raise_error(
+                inventory_error, /#{inventory_error_missing}/)
+            end
+          end
+        end
+      end
+
+      describe '#remove' do
+        context 'when a version is specified' do
+          it 'removes the specified version of Terraform' do
+            test_versions.each do |semver|
+              binary = subject[semver]
+              expect(File.exist?(binary)).to be_truthy
+              expect(subject.remove(semver)).to be_truthy
+              expect(File.exist?(binary)).to be_falsey
+            end
+          end
+        end
+
+        context 'when no version is specified' do
+          before do
+            @semver = '0.11.14'
+            Terradactyl::Terraform::VersionManager.reset!
+            Terradactyl::Terraform::VersionManager.install(@semver)
+          end
+
+          it 'removes the default version' do
+            Terradactyl::Terraform::VersionManager.version = @semver
+            binary = subject[@semver]
+            expect(File.exist?(binary)).to be_truthy
+            expect(subject.remove).to be_truthy
+            expect(File.exist?(binary)).to be_falsey
+          end
+        end
+      end
+    end
   end
 
-  let(:test_versions) { %w[0.11.14 0.12.2] }
-
-  context 'global configuration' do
-
+  context 'configuration' do
     before(:each) do
       @temp_dir = Dir.mktmpdir('terradactyl')
     end
@@ -30,9 +189,9 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
     end
 
     it 'responds to requests for options' do
-      expect(subject.install_dir).to eq(Gem.bindir)
-      expect(subject.downloads_url).to eq('https://www.terraform.io/downloads.html')
-      expect(subject.releases_url).to eq('https://releases.hashicorp.com/terraform')
+      expect(subject.install_dir).to eq(install_dir)
+      expect(subject.downloads_url).to eq(downloads_url)
+      expect(subject.releases_url).to eq(releases_url)
     end
 
     describe 'block configuration' do
@@ -50,91 +209,50 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
     end
   end
 
-  context 'inventory control' do
-    describe '#latest' do
-      it 'returns the latest version of terraform' do
-        expect(subject.latest).to match(/0\.12\.\d+/)
+  context 'inventory' do
+    before(:all) do
+      @test_versions.each do |semver|
+        Terradactyl::Terraform::VersionManager.install(semver)
       end
     end
 
-    context 'default install_dir' do
-      describe '#install' do
-        it 'installs the specified version of Terraform' do
-          test_versions.each do |semver|
-            expect(subject.install(semver)).to be_truthy
-            expect(File.exist?(subject[semver])).to be_truthy
-            expect(File.stat(subject[semver]).mode).to eq(33261)
-            cmd_output =`#{subject[semver]}`
-            exit_code  = $?.exitstatus
-            expect(cmd_output).to match(/Usage: terraform/)
-            expect(exit_code).to eq(127)
-          end
-        end
+    after(:all) do
+      @test_versions.each do |semver|
+        Terradactyl::Terraform::VersionManager.remove(semver)
       end
+    end
 
-      describe '#list' do
-        it 'provides a list of accessible terraform binaries' do
-          expect(subject.list).to be_a(Array)
-          expect(subject.list.size).to eq(test_versions.size)
-        end
+    describe '#inventory' do
+      it 'returns an Inventory object' do
+        expect(subject.inventory).to be_a(Terradactyl::Terraform::VersionManager::Inventory)
       end
+    end
 
-      describe '#inventory' do
-        it 'provides a table of accessible binaries by version' do
-          expect(subject.inventory).to be_a(Hash)
-          expect(subject.inventory.size).to eq(test_versions.size)
-        end
-        it 'accepts a semver string to lookup' do
-          test_versions.each do |version|
-            expect(subject.inventory(version)).to match(/terraform-#{version}/)
-          end
-        end
+    describe '#[]' do
+      it 'returns the binary path' do
+        expect(subject[test_versions.last]).to eq(test_binaries.last)
       end
+    end
 
-      describe '#[]' do
-        it 'does an inventory lookup' do
-          expect(subject['0.0.0']).to be_nil
-          test_versions.each do |version|
-            expect(subject[version]).to match(/terraform-#{version}/)
-          end
-        end
+    describe 'versions' do
+      it 'returns a list of installed versions' do
+        expect(subject.versions).to be_a(Array)
+        expect(subject.versions).to_not be_empty
+        expect(subject.versions).to eq(test_versions)
       end
+    end
 
-      describe '#binary' do
-        context 'when none are installed' do
-          before do
-            @temp_dir = Dir.mktmpdir('terradactyl')
-            Terradactyl::Terraform::VersionManager.options do |option|
-              option.install_dir = @temp_dir
-            end
-          end
-
-          after do
-            FileUtils.rm_rf @temp_dir
-            described_class.reset!
-          end
-
-          it 'returns forces terraform lookup on $PATH' do
-            expect(subject.binary).to eq('terraform')
-          end
-        end
-
-        context 'when none are installed' do
-          it 'returns most recent version from install dir' do
-            expect(subject.binary).to eq(subject.inventory(test_versions.last))
-          end
-        end
+    describe '#binaries' do
+      it 'returns a list of managed Terraform binaries' do
+        expect(subject.binaries).to be_a(Array)
+        expect(subject.binaries).to_not be_empty
+        expect(subject.binaries).to eq(test_binaries)
       end
+    end
 
-      describe '#remove' do
-        it 'removes the specified version of Terraform' do
-          test_versions.each do |semver|
-            binary = subject[semver]
-            expect(File.exist?(binary)).to be_truthy
-            expect(subject.remove(semver)).to be_truthy
-            expect(File.exist?(binary)).to be_falsey
-          end
-        end
+    describe '#any?' do
+      it 'returns true if any binaries are installed' do
+        expect(subject.any?).to be_truthy
       end
     end
   end

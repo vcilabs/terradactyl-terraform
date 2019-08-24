@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'version_manager/inventory'
 require_relative 'version_manager/defaults'
 require_relative 'version_manager/downloader'
 require_relative 'version_manager/package'
@@ -7,84 +8,57 @@ require_relative 'version_manager/binary'
 
 module Terradactyl
   module Terraform
-    class VersionError < RuntimeError
-      attr_reader :minimum, :current, :required
-
-      def initialize(msg, minimum, required)
-        @minimum  = minimum
-        @required = required
-        super(msg)
-      end
-    end
-
     module VersionManager
-      class << self
-        MIN_VERSION   = '0.11.10'
-        ERROR_VERSION = 'Terraform version mismatch'
-        ERROR_INSTALL = 'Terraform not installed'
+      class VersionManagerError < RuntimeError
+        def initialize(msg)
+          super(msg)
+        end
+      end
 
-        attr_writer :options
+      ERROR_MISSING = 'Terraform not installed'
+
+      @options   = Defaults.load
+      @inventory = Inventory.load
+
+      class << self
+        extend Forwardable
+
+        def_delegators :@options, :version, :version=, :install_dir,
+                       :install_dir=, :downloads_url, :downloads_url=,
+                       :releases_url, :releases_url=, :reset!
+
+        def_delegators :@inventory, :[], :versions, :binaries, :any?
+
+        attr_reader :inventory
 
         def options
-          @options ||= Defaults.load
           block_given? ? yield(@options) : @options
+        end
+
+        def binary
+          return inventory.validate(version) if version
+          return inventory[inventory.latest] if inventory.any?
+
+          raise VersionManagerError.new(ERROR_MISSING)
         end
 
         def latest
           calculate_latest
         end
 
-        def install(version, type: Binary)
-          package = type.new(version: version)
+        def install(semver = nil, type: Binary)
+          semver ||= version
+          package = type.new(version: semver)
           package.install
         end
 
-        def remove(version, type: Binary)
-          package = type.new(version: version)
+        def remove(semver = nil, type: Binary)
+          semver ||= version
+          package = type.new(version: semver)
           package.remove
         end
 
-        def seatbelt(semver)
-          version_error(ERROR_INSTALL, semver) unless any?
-          version_error(ERROR_VERSION, semver) unless minimum?
-          version_error(ERROR_VERSION, semver) unless inventory(semver)
-        end
-
-        def list
-          managed_binaries
-        end
-
-        def inventory(semver = nil)
-          @inventory = managed_binaries.each_with_object({}) do |path, memo|
-            match = File.basename(path).match(inventory_name_re)['version']
-            memo[match] = path
-          end
-          semver ? @inventory[semver] : @inventory
-        end
-
-        def [](semver)
-          inventory[semver]
-        end
-
-        def any?
-          managed_binaries.any?
-        end
-
-        def minimum?
-          (inventory.select do |semver|
-            Gem::Version.new(semver) >= Gem::Version.new(minimum)
-          end).any?
-        end
-
         private
-
-        def minimum
-          MIN_VERSION
-        end
-
-        def version_error(msg, required)
-          raise VersionError.new(msg, minimum, required)
-        end
 
         def calculate_latest
           fh = Downloader.fetch(downloads_url)
@@ -93,20 +67,6 @@ module Terradactyl
         ensure
           fh.close
           fh.unlink
-        end
-
-        def inventory_name_re
-          /(?:terraform-)(?<version>\d+\.\d+\.\d+)/
-        end
-
-        def method_missing(sym, *args, &block)
-          options.send(sym.to_sym, *args, &block)
-        rescue NameError
-          super
-        end
-
-        def respond_to_missing?(sym, *args)
-          options.respond_to?(sym) || super
         end
       end
     end

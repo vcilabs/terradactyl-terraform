@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
   before(:all) do
-    Terradactyl::Terraform::VersionManager.managed_binaries.each do |path|
+    Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
       FileUtils.rm path
     end
   end
@@ -11,16 +11,8 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
     subject.reset!
   end
 
-  let(:binary) do
-    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_BINARY
-  end
-
   let(:version) do
     Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_VERSION
-  end
-
-  let(:autoinstall) do
-    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_AUTOINSTALL
   end
 
   let(:install_dir) do
@@ -44,21 +36,9 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
   end
 
   context 'simple initialization' do
-    describe '#binary' do
-      it 'returns the default value' do
-        expect(subject.binary).to eq(binary)
-      end
-    end
-
     describe '#version' do
       it 'returns the default value' do
         expect(subject.version).to eq(version)
-      end
-    end
-
-    describe '#autoinstall' do
-      it 'returns the default value' do
-        expect(subject.autoinstall).to eq(autoinstall)
       end
     end
 
@@ -94,21 +74,6 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
   end
 
   context 'provides nil-safe defaults' do
-    describe '#binary=' do
-      it 'ignores empty values' do
-        subject.binary = ''
-        expect(subject.binary).to eq(binary)
-      end
-      it 'ignores nil values' do
-        subject.binary = nil
-        expect(subject.binary).to eq(binary)
-      end
-      it 'ignores invalid path values' do
-        subject.binary = 'some/fake/path'
-        expect(subject.binary).to eq(binary)
-      end
-    end
-
     describe '#version=' do
       it 'ignores empty values' do
         subject.version = ''
@@ -119,23 +84,8 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
         expect(subject.version).to eq(version)
       end
       it 'ignores invalid strings' do
-        subject.binary = '0.0'
+        subject.version = '0.0'
         expect(subject.version).to eq(version)
-      end
-    end
-
-    describe '#autoinstall=' do
-      it 'ignores empty values' do
-        subject.autoinstall = ''
-        expect(subject.autoinstall).to eq(autoinstall)
-      end
-      it 'ignores nil values' do
-        subject.autoinstall = nil
-        expect(subject.autoinstall).to eq(autoinstall)
-      end
-      it 'ignores invalid strings' do
-        subject.autoinstall = 'true'
-        expect(subject.autoinstall).to eq(autoinstall)
       end
     end
 

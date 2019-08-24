@@ -32,10 +32,10 @@ module Terradactyl
         end
 
         def delete
-          if @fh
-            @fh.close
-            @fh.unlink
-          end
+          return unless @fh
+
+          @fh.close
+          @fh.unlink
         end
       end
     end

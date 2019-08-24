@@ -1,11 +1,41 @@
 require 'spec_helper'
 
 RSpec.describe Terradactyl::Terraform::Commands::Base do
+  let(:install_error) do
+    Terradactyl::Terraform::VersionManager::VersionManagerError
+  end
+
+  let(:install_error_msg) do
+    Terradactyl::Terraform::VersionManager::ERROR_MISSING
+  end
+
   before(:all) do
-    Terradactyl::Terraform::VersionManager.install('0.11.14')
+    Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
+      FileUtils.rm path
+    end
+  end
+
+  after(:all) do
+    Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
+      FileUtils.rm path
+    end
+  end
+
+  context 'when no versions are installed' do
+    describe '#execute' do
+      it 'raises an error ' do
+        expect { subject.execute }.to raise_error(
+          install_error, /#{install_error_msg}/)
+      end
+    end
   end
 
   context 'initialization' do
+    before(:all) do
+      Terradactyl::Terraform::VersionManager.install('0.11.14')
+      Terradactyl::Terraform::VersionManager.version = '0.11.14'
+    end
+
     describe '#execute' do
       it 'exits with error 127' do
         silence { expect(subject.execute).to eq(127) }
@@ -72,61 +102,6 @@ RSpec.describe Terradactyl::Terraform::Commands::Base do
         expect(captured.stdout).to match(/Usage: terraform/)
         expect(captured.stderr).to be_empty
         expect(captured.exitstatus).to eq(127)
-      end
-    end
-  end
-
-  context 'when a version is specified' do
-    before(:each) do
-      Terradactyl::Terraform::VersionManager.list.each do |path|
-        FileUtils.rm path
-      end
-    end
-
-    after(:all) do
-      Terradactyl::Terraform::VersionManager.list.each do |path|
-        FileUtils.rm path
-      end
-    end
-
-    let(:error) { Terradactyl::Terraform::VersionError }
-
-    context 'when no versions are installed' do
-      describe '#execute' do
-        it 'raises an error ' do
-          subject.options.version = '0.0.0'
-          expect { subject.execute }.to raise_error(error, /Terraform not installed/)
-        end
-      end
-    end
-
-    context 'when the version does not meet minimum requirements' do
-      describe '#execute' do
-        it 'raises an error ' do
-          Terradactyl::Terraform::VersionManager.install('0.9.0')
-          subject.options.version = '0.0.0'
-          expect { subject.execute }.to raise_error(error, /Terraform version mismatch/)
-        end
-      end
-    end
-
-    context 'when the specified version is not installed' do
-      describe '#execute' do
-        it 'raises an error ' do
-          Terradactyl::Terraform::VersionManager.install('0.9.0')
-          subject.options.version = '0.0.0'
-          expect { subject.execute }.to raise_error(error, /Terraform version mismatch/)
-        end
-      end
-    end
-
-    context 'when autoinstall is true' do
-      describe '#execute' do
-        it 'installs version on-demand ' do
-          subject.options.version     = '0.11.14'
-          subject.options.autoinstall = true
-          expect { subject.execute }.to output(/Usage: terraform/).to_stdout
-        end
       end
     end
   end

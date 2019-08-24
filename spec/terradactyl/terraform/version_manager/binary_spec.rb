@@ -5,13 +5,13 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Binary do
 
   context 'with no args' do
     before(:all) do
-      Terradactyl::Terraform::VersionManager.list.each do |path|
+      Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
         FileUtils.rm path
       end
     end
 
     after(:all) do
-      Terradactyl::Terraform::VersionManager.list.each do |path|
+      Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
         FileUtils.rm path
       end
     end

@@ -10,6 +10,7 @@ require 'ostruct'
 require 'deepsort'
 require 'deep_merge'
 require 'digest'
+require 'forwardable'
 
 require_relative 'terraform/version'
 require_relative 'terraform/planfile'

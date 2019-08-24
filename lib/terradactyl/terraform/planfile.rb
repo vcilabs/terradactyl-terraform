@@ -1,9 +1,8 @@
+# frozen_string_literal: true
+
 module Terradactyl
-
   module Terraform
-
     class PlanFile
-
       attr_reader :data, :summary, :file_name, :base_folder, :stack_name,
                   :options
 
@@ -12,26 +11,28 @@ module Terradactyl
       end
 
       def initialize(plan_path, options: nil)
-        @add, @change, @destroy = 0, 0, 0
-        @options                = options || Commands::Options.new
-        @file_name              = File.basename(plan_path)
-        @stack_name             = File.basename(plan_path, '.tfout')
-        @base_folder            = File.dirname(plan_path).split('/')[-2]
-        @data                   = read_plan(plan_path)
-        @summary                = generate_summary
+        @add         = 0
+        @change      = 0
+        @destroy     = 0
+        @options     = options || Commands::Options.new
+        @file_name   = File.basename(plan_path)
+        @stack_name  = File.basename(plan_path, '.tfout')
+        @base_folder = File.dirname(plan_path).split('/')[-2]
+        @data        = read_plan(plan_path)
+        @summary     = generate_summary
       end
 
       def checksum
         Digest::SHA1.hexdigest normalize(data)
       end
 
-      def to_markdown(base_folder=nil)
+      def to_markdown(base_folder = nil)
         [
           "#### #{[base_folder, stack_name].compact.join('/')}",
           '```',
           data,
           "  #{summary}",
-          '```',
+          '```'
         ].compact.join("\n")
       end
 
@@ -40,7 +41,7 @@ module Terradactyl
       end
 
       def <=>(other)
-        self.data <=> other.data
+        data <=> other.data
       end
 
       def normalized
@@ -48,14 +49,14 @@ module Terradactyl
       end
 
       def modified?
-        @modified ||= ! [@add, @change, @destroy].reduce(&:+).zero?
+        @modified ||= ![@add, @change, @destroy].reduce(&:+).zero?
       end
 
       private
 
       def normalize(data)
-        lines = data.split("\n").inject([]) do |memo,line|
-          memo << normalize_line(line); memo
+        lines = data.split("\n").each_with_object([]) do |line, memo|
+          memo << normalize_line(line)
         end
         lines.join("\n")
       end
@@ -77,10 +78,10 @@ module Terradactyl
       end
 
       def normalize_line(line)
-        if caps = line.match(re_json_line)
+        if (caps = line.match(re_json_line))
           blobs = caps['json'].split(' => ').map { |blob| normalize_json(blob) }
           blobs = blobs.join(' => ')
-          line  = [caps['attrib'], %{#{blobs}}].join
+          line  = [caps['attrib'], %(#{blobs})].join
         end
         line
       rescue JSON::ParserError
@@ -94,13 +95,14 @@ module Terradactyl
                                           options: options,
                                           capture: true)
         raise 'Error reading plan file!' unless captured.exitstatus.zero?
+
         captured.stdout
       end
 
       def generate_summary
-        template = "Plan: %i to add, %i to change, %i to destroy."
+        template = 'Plan: %i to add, %i to change, %i to destroy.'
         @data.each_line do |line|
-          if cap = line.match(/^\s{0,2}(?<op>(?:[+-~]|-\/\+))\s/)
+          if (cap = line.match(%r(^\s{0,2}(?<op>(?:[+-~]|-\/\+))\s)))
             case cap['op']
             when '+'
               @add += 1
@@ -115,11 +117,9 @@ module Terradactyl
           end
         end
         return 'No changes. Infrastructure is up-to-date.' unless modified?
+
         template % [@add, @change, @destroy]
       end
-
     end
-
   end
-
 end
