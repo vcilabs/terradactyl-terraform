@@ -7,40 +7,6 @@ RSpec.describe Terradactyl::Terraform::Commands::Options do
   end
 
   context 'simple initialization' do
-    describe '#binary' do
-      context 'VersionManager has installed binaries' do
-        before do
-          @version = '0.11.14'
-          Terradactyl::Terraform::VersionManager.install(@version)
-        end
-
-        after do
-          Terradactyl::Terraform::VersionManager.remove(@version)
-        end
-
-        it 'returns VersionManager binary path' do
-          expect(subject.binary).to match(/terraform-#{@version}/)
-        end
-      end
-      context 'VersionManager has not installed binaries' do
-        it 'returns the default value' do
-          expect(subject.binary).to eq('terraform')
-        end
-      end
-    end
-
-    describe '#version' do
-      it 'returns the default value' do
-        expect(subject.version).to be_nil
-      end
-    end
-
-    describe '#autoinstall' do
-      it 'returns the default value' do
-        expect(subject.seatbelt).to be_falsey
-      end
-    end
-
     describe '#quiet' do
       it 'returns the default value' do
         expect(subject.quiet).to be_falsey
@@ -81,13 +47,6 @@ RSpec.describe Terradactyl::Terraform::Commands::Options do
       it 'sets the value' do
         subject.path = 'foo'
         expect(subject.path).to eq('foo')
-      end
-    end
-
-    describe '#version=' do
-      it 'sets the value' do
-        subject.version = '0.0.0'
-        expect(subject.version).to eq('0.0.0')
       end
     end
   end

@@ -1,12 +1,18 @@
 require 'spec_helper'
 
 RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
+  before(:all) do
+    Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
+      FileUtils.rm path
+    end
+  end
+
   after(:each) do
     subject.reset!
   end
 
-  let(:binary) do
-    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_BINARY
+  let(:version) do
+    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_VERSION
   end
 
   let(:install_dir) do
@@ -21,10 +27,18 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
     Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_RELEASES_URL
   end
 
+  describe '#reset!' do
+    it 'reloads defaults' do
+      subject.version = '0.12.6'
+      subject.reset!
+      expect(subject.version).to eq(version)
+    end
+  end
+
   context 'simple initialization' do
-    describe '#binary' do
+    describe '#version' do
       it 'returns the default value' do
-        expect(subject.binary).to eq(binary)
+        expect(subject.version).to eq(version)
       end
     end
 
@@ -60,23 +74,18 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
   end
 
   context 'provides nil-safe defaults' do
-    describe '#binary=' do
+    describe '#version=' do
       it 'ignores empty values' do
-        subject.binary = ''
-        expect(subject.binary).to eq(binary)
+        subject.version = ''
+        expect(subject.version).to eq(version)
       end
       it 'ignores nil values' do
-        subject.binary = nil
-        expect(subject.binary).to eq(binary)
+        subject.version = nil
+        expect(subject.version).to eq(version)
       end
-      it 'ignores invalid path values' do
-        subject.binary = 'some/fake/path'
-        expect(subject.binary).to eq(binary)
-      end
-      it 'expands valid path values' do
-        subject.install_dir = '~/'
-        expect(subject.install_dir).not_to eq('~/')
-        expect(subject.install_dir).to eq(File.expand_path('~/'))
+      it 'ignores invalid strings' do
+        subject.version = '0.0'
+        expect(subject.version).to eq(version)
       end
     end
 

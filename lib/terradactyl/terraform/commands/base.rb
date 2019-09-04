@@ -10,9 +10,9 @@ module Terradactyl
       def select_revision(version, klass)
         klass_name = klass.name.split('::').last
         const_name = "#{revision(version)}::#{klass_name}"
-        unless klass_name == 'Base'
-          klass.send(:include, Terradactyl::Terraform.const_get(const_name))
-        end
+        return if klass_name == 'Base'
+
+        klass.send(:include, Terradactyl::Terraform.const_get(const_name))
       end
     end
 
@@ -34,7 +34,6 @@ module Terradactyl
 
         def execute(capture: false)
           cmd = assemble_command
-          seatbelt
           echo_cmd(cmd)
           send((capture ? :capture3 : :popen3), ENV, cmd)
         end
@@ -58,20 +57,7 @@ module Terradactyl
         end
 
         def binary
-          return autoinstall if options.version
-
-          options.binary
-        end
-
-        def autoinstall
-          VersionManager.install_dir = options.install_dir
-          return VersionManager.install(options.version) if options.autoinstall
-
-          VersionManager[options.version]
-        end
-
-        def seatbelt
-          VersionManager.seatbelt(options.version) if options.version
+          VersionManager.binary
         end
 
         def environment

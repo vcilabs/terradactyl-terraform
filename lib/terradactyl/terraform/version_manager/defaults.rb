@@ -7,13 +7,13 @@ module Terradactyl
         DEFAULT_INSTALL_DIR   = Gem.bindir
         DEFAULT_DOWNLOADS_URL = 'https://www.terraform.io/downloads.html'
         DEFAULT_RELEASES_URL  = 'https://releases.hashicorp.com/terraform'
-        DEFAULT_BINARY        = 'terraform'
+        DEFAULT_VERSION       = nil
 
         def self.load
           new
         end
 
-        attr_reader :install_dir, :downloads_url, :releases_url
+        attr_reader :version, :install_dir, :downloads_url, :releases_url
 
         def initialize
           load_defaults
@@ -23,12 +23,8 @@ module Terradactyl
           load_defaults
         end
 
-        def binary
-          VersionManager.list.last || DEFAULT_BINARY
-        end
-
-        def binary=(option)
-          @binary = validate_path(option) || binary
+        def version=(option)
+          @version = validate_semver(option) || DEFAULT_VERSION
         end
 
         def install_dir=(option)
@@ -45,6 +41,12 @@ module Terradactyl
 
         private
 
+        def validate_semver(option)
+          return nil if option.to_s.empty?
+
+          option.split('.').size == 3 ? option : nil
+        end
+
         def validate_path(option)
           return nil if option.to_s.empty?
 
@@ -56,14 +58,14 @@ module Terradactyl
           return nil if option.to_s.empty?
 
           uri = URI.parse(option)
-          url if uri.kind_of?(URI::HTTP) || uri.kind_of?(URI::HTTPS)
+          url if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
         end
 
         def load_defaults
           @install_dir   = DEFAULT_INSTALL_DIR
           @downloads_url = DEFAULT_DOWNLOADS_URL
           @releases_url  = DEFAULT_RELEASES_URL
-          @binary        = DEFAULT_BINARY
+          @version       = DEFAULT_VERSION
         end
       end
     end
