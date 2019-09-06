@@ -1,9 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe Terradactyl::Terraform::Commands do
-  context 'when revision is Terraform 0.11.x' do
+  context 'when binary is Terraform 0.12.x' do
     before(:all) do
-      @version    = '0.11.14'
+      Terradactyl::Terraform::VersionManager.binaries.each do |file|
+        FileUtils.rm_rf file
+      end
+      Terradactyl::Terraform::VersionManager.reset!
+
+      @version    = '0.12.7'
       @options    = Terradactyl::Terraform::Commands::Options
       @stack_name = 'stack_a'
       @stack_dir  = "stacks/#{@stack_name}"
@@ -15,14 +20,16 @@ RSpec.describe Terradactyl::Terraform::Commands do
     end
 
     after(:all) do
-      @artifacts.each_pair { |_k,v| FileUtils.rm_rf(v) if File.exist?(v) }
+      Terradactyl::Terraform::VersionManager.binaries.each do |file|
+        FileUtils.rm_rf file
+      end
+      Terradactyl::Terraform::VersionManager.reset!
     end
 
     describe Terradactyl::Terraform::Commands::Fmt do
       let(:unlinted) do
         <<~LINT_ME
-          resource "null_resource" "unlinted"
-          {}
+          resource "null_resource" "unlinted"{}
         LINT_ME
       end
 
@@ -353,6 +360,7 @@ RSpec.describe Terradactyl::Terraform::Commands do
       let(:options) do
         @options.new({
           quiet: true,
+          json: true
         })
       end
 
@@ -379,24 +387,6 @@ RSpec.describe Terradactyl::Terraform::Commands do
               expect(command).to eq(1)
             }
           end
-        end
-      end
-    end
-
-    describe Terradactyl::Terraform::Commands::Checklist do
-      let(:options) do
-        @options.new({
-          quiet: true,
-        })
-      end
-
-      let(:command) do
-        described_class.execute(dir_or_plan: @stack_dir, options: options)
-      end
-
-      describe '.execute' do
-        it 'performs a Terraform upgrade readiness check' do
-          expect(command).to eq(0)
         end
       end
     end

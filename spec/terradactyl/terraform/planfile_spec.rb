@@ -24,6 +24,12 @@ RSpec.describe Terradactyl::Terraform::PlanFile do
     VersionManager.install(@version)
   end
 
+  after(:all) do
+    Terradactyl::Terraform::VersionManager.binaries.each do |file|
+      FileUtils.rm_rf file
+    end
+    Terradactyl::Terraform::VersionManager.reset!
+  end
 
   before(:each) do
     Commands::Init.execute(dir_or_plan: @stack_dir, options: @options_init)

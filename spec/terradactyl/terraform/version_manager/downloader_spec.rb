@@ -1,6 +1,20 @@
 require 'spec_helper'
 
 RSpec.describe Terradactyl::Terraform::VersionManager::Downloader do
+  before(:all) do
+    Terradactyl::Terraform::VersionManager.binaries.each do |file|
+      FileUtils.rm_rf file
+    end
+    Terradactyl::Terraform::VersionManager.reset!
+  end
+
+  after(:all) do
+    Terradactyl::Terraform::VersionManager.binaries.each do |file|
+      FileUtils.rm_rf file
+    end
+    Terradactyl::Terraform::VersionManager.reset!
+  end
+
   let(:url) { 'https://releases.hashicorp.com/terraform/0.12.2/terraform_0.12.2_darwin_amd64.zip' }
 
   describe '.fetch' do

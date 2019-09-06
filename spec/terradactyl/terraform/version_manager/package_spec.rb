@@ -1,6 +1,20 @@
 require 'spec_helper'
 
 RSpec.describe Terradactyl::Terraform::VersionManager::Package do
+  before(:all) do
+    Terradactyl::Terraform::VersionManager.binaries.each do |file|
+      FileUtils.rm_rf file
+    end
+    Terradactyl::Terraform::VersionManager.reset!
+  end
+
+  after(:all) do
+    Terradactyl::Terraform::VersionManager.binaries.each do |file|
+      FileUtils.rm_rf file
+    end
+    Terradactyl::Terraform::VersionManager.reset!
+  end
+
   let(:subject) { Object.new.extend(described_class) }
 
   describe '#architecture' do

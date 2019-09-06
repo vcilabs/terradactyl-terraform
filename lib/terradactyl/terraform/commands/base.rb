@@ -7,12 +7,12 @@ module Terradactyl
         version ? ['Rev', *version.split('.').take(2)].join : 'Rev011'
       end
 
-      def select_revision(version, klass)
-        klass_name = klass.name.split('::').last
+      def select_revision(version, object)
+        klass_name = object.class.name.split('::').last
         const_name = "#{revision(version)}::#{klass_name}"
         return if klass_name == 'Base'
 
-        klass.send(:include, Terradactyl::Terraform.const_get(const_name))
+        object.extend(Terradactyl::Terraform.const_get(const_name))
       end
     end
 
@@ -28,7 +28,7 @@ module Terradactyl
         def initialize(dir_or_plan: nil, options: nil)
           @dir_or_plan = dir_or_plan.to_s
           @options     = options || Options.new
-          Terradactyl::Terraform.select_revision(@options.version, self.class)
+          Terradactyl::Terraform.select_revision(version, self)
           inject_env_vars
         end
 
@@ -58,6 +58,10 @@ module Terradactyl
 
         def binary
           VersionManager.binary
+        end
+
+        def version
+          File.basename(VersionManager.binary, '.exe').split('-').last
         end
 
         def environment

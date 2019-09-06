@@ -2,13 +2,17 @@ require 'spec_helper'
 
 RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
   before(:all) do
-    Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
-      FileUtils.rm path
+    Terradactyl::Terraform::VersionManager.binaries.each do |file|
+      FileUtils.rm_rf file
     end
+    Terradactyl::Terraform::VersionManager.reset!
   end
 
-  after(:each) do
-    subject.reset!
+  after(:all) do
+    Terradactyl::Terraform::VersionManager.binaries.each do |file|
+      FileUtils.rm_rf file
+    end
+    Terradactyl::Terraform::VersionManager.reset!
   end
 
   let(:version) do

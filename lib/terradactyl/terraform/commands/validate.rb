@@ -23,7 +23,19 @@ module Terradactyl
 
     module Rev012
       module Validate
-        include Rev011::Validate
+        def defaults
+          {
+            'no-color' => nil,
+            'json'     => nil,
+          }
+        end
+
+        def switches
+          %w[
+            no-color
+            json
+          ]
+        end
       end
     end
 
