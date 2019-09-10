@@ -7,6 +7,13 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
     @test_binaries = @test_versions.map { |v| "#{@install_dir}/terraform-#{v}" }
   end
 
+  after(:all) do
+    Terradactyl::Terraform::VersionManager.binaries.each do |file|
+      FileUtils.rm_rf file
+    end
+    Terradactyl::Terraform::VersionManager.reset!
+  end
+
   let(:install_dir) { @install_dir }
 
   let(:install_error) do

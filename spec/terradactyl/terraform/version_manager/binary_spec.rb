@@ -5,15 +5,17 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Binary do
 
   context 'with no args' do
     before(:all) do
-      Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
-        FileUtils.rm path
+      Terradactyl::Terraform::VersionManager.binaries.each do |file|
+        FileUtils.rm_rf file
       end
+      Terradactyl::Terraform::VersionManager.reset!
     end
 
     after(:all) do
-      Terradactyl::Terraform::VersionManager.inventory.each do |_version, path|
-        FileUtils.rm path
+      Terradactyl::Terraform::VersionManager.binaries.each do |file|
+        FileUtils.rm_rf file
       end
+      Terradactyl::Terraform::VersionManager.reset!
     end
 
     describe '#initialize' do
