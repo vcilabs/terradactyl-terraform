@@ -203,6 +203,7 @@ RSpec.describe Terradactyl::Terraform::Commands do
       context 'with a valid arguments' do
         let(:options) do
           @options.new({
+            json: true,
             quiet: false,
           })
         end
