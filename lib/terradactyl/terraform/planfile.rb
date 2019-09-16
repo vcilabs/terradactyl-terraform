@@ -2,123 +2,172 @@
 
 module Terradactyl
   module Terraform
-    class PlanFile
-      attr_reader :data, :summary, :file_name, :base_folder, :stack_name,
-                  :options
+    module Rev012
+      class PlanFileParser
+        attr_reader :plan_path
 
-      def self.load(plan_path, options: nil)
-        new(plan_path, options: options)
+        def self.load(plan_path)
+          new(plan_path)
+        end
+
+        def initialize(plan_path)
+          @plan_path = plan_path
+        end
+
+        def checksum
+          Digest::SHA1.hexdigest(data)
+        end
+
+        def data
+          @data ||= parse(@plan_path)
+        end
+
+        private
+
+        def parse(plan_path)
+          captured = Commands::Show.execute(dir_or_plan: plan_path,
+                                            options: options,
+                                            capture: true)
+          raise 'Error reading plan file!' unless captured.exitstatus.zero?
+
+          captured.stdout
+        end
+
+        def options
+          Commands::Options.new do |opts|
+            opts.environment = {}
+            opts.no_color    = true unless ENV['TF_CLI_ARGS'] =~ /-no-color/
+            opts.json        = true
+          end
+        end
+      end
+    end
+
+    module Rev011
+      class PlanFileParser < Rev012::PlanFileParser
+        def checksum
+          Digest::SHA1.hexdigest(normalize(data))
+        end
+
+        private
+
+        def options
+          Commands::Options.new do |opts|
+            opts.environment = {}
+            opts.no_color    = true unless ENV['TF_CLI_ARGS'] =~ /-no-color/
+          end
+        end
+
+        def normalize(data)
+          lines = data.split("\n").each_with_object([]) do |line, memo|
+            memo << normalize_line(line)
+          end
+          lines.join("\n")
+        end
+
+        def re_json_blob
+          /\"{\\n.+?\\n}\"/
+        end
+
+        def re_json_line
+          /^(?<attrib>\s+\w+:\s+)(?<json>.+?#{re_json_blob}.*)/
+        end
+
+        def normalize_json(blob)
+          if blob.match(re_json_blob)
+            un_esc = eval(blob).chomp
+            return JSON.parse(un_esc).deep_sort.to_json.inspect
+          end
+          blob
+        end
+
+        def normalize_line(line)
+          if (caps = line.match(re_json_line))
+            blobs = caps['json'].split(' => ').map { |blob| normalize_json(blob) }
+            blobs = blobs.join(' => ')
+            line  = [caps['attrib'], %(#{blobs})].join
+          end
+          line
+        rescue JSON::ParserError
+          line
+        end
+      end
+    end
+
+    class PlanFile
+      def self.load(artifact_path: artifact)
+        Marshal.load(File.read(artifact_path))
       end
 
-      def initialize(plan_path, options: nil)
-        @add         = 0
-        @change      = 0
-        @destroy     = 0
-        @options     = options || Commands::Options.new
+      attr_reader   :data, :checksum, :file_name, :stack_name
+      attr_accessor :base_folder, :plan_output
+
+      WARN_NO_PLAN_OUTPUT = 'WARN: no plan output is available'
+
+      def initialize(plan_path:, parser:)
+        @parser      = parser
         @file_name   = File.basename(plan_path)
         @stack_name  = File.basename(plan_path, '.tfout')
         @base_folder = File.dirname(plan_path).split('/')[-2]
-        @data        = read_plan(plan_path)
-        @summary     = generate_summary
+
+        parser.load(plan_path).tap do |dat|
+          @data     = dat.data
+          @checksum = dat.checksum
+        end
       end
 
-      def checksum
-        Digest::SHA1.hexdigest normalize(data)
+      def save(artifact_path: artifact)
+        @artifact = artifact_path
+        File.write(artifact, Marshal.dump(self))
       end
 
-      def to_markdown(base_folder = nil)
+      def delete
+        FileUtils.rm(artifact) if exist?
+      end
+
+      def exist?
+        File.exist?(artifact)
+      end
+
+      def plan_output
+        format_output(@plan_output)
+      end
+
+      def to_markdown
         [
           "#### #{[base_folder, stack_name].compact.join('/')}",
           '```',
-          data,
-          "  #{summary}",
+          plan_output,
           '```'
         ].compact.join("\n")
       end
 
       def to_s
-        @data
+        data
       end
 
       def <=>(other)
         data <=> other.data
       end
 
-      def normalized
-        normalize(data)
-      end
-
-      def modified?
-        @modified ||= ![@add, @change, @destroy].reduce(&:+).zero?
-      end
-
       private
 
-      def normalize(data)
-        lines = data.split("\n").each_with_object([]) do |line, memo|
-          memo << normalize_line(line)
+      def artifact
+        @artifact ||= File.join(ENV['TF_DATA_DIR'],
+                                'terradactyl.planfile.data')
+      end
+
+      def format_output(string)
+        return WARN_NO_PLAN_OUTPUT unless string
+
+        delimit = '-' * 72
+        content = string.split(delimit).compact.reject(&:empty?)
+
+        if content.size == 2
+          content.last.strip
+        else
+          content[content.size / 3].strip
         end
-        lines.join("\n")
-      end
-
-      def re_json_blob
-        /\"{\\n.+?\\n}\"/
-      end
-
-      def re_json_line
-        /^(?<attrib>\s+\w+:\s+)(?<json>.+?#{re_json_blob}.*)/
-      end
-
-      def normalize_json(blob)
-        if blob.match(re_json_blob)
-          un_esc = eval(blob).chomp
-          return JSON.parse(un_esc).deep_sort.to_json.inspect
-        end
-        blob
-      end
-
-      def normalize_line(line)
-        if (caps = line.match(re_json_line))
-          blobs = caps['json'].split(' => ').map { |blob| normalize_json(blob) }
-          blobs = blobs.join(' => ')
-          line  = [caps['attrib'], %(#{blobs})].join
-        end
-        line
-      rescue JSON::ParserError
-        line
-      end
-
-      def read_plan(plan_path)
-        options.environment = {}
-        options.no_color = true unless ENV['TF_CLI_ARGS'] =~ /-no-color/
-        captured = Commands::Show.execute(dir_or_plan: plan_path,
-                                          options: options,
-                                          capture: true)
-        raise 'Error reading plan file!' unless captured.exitstatus.zero?
-
-        captured.stdout
-      end
-
-      def generate_summary
-        template = 'Plan: %i to add, %i to change, %i to destroy.'
-        @data.each_line do |line|
-          if (cap = line.match(%r(^\s{0,2}(?<op>(?:[+-~]|-\/\+))\s)))
-            case cap['op']
-            when '+'
-              @add += 1
-            when '~'
-              @change += 1
-            when '-'
-              @destroy += 1
-            when '-/+'
-              @add += 1
-              @destroy += 1
-            end
-          end
-        end
-        return 'No changes. Infrastructure is up-to-date.' unless modified?
-
-        template % [@add, @change, @destroy]
       end
     end
   end

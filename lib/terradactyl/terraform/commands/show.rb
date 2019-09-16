@@ -21,7 +21,19 @@ module Terradactyl
 
     module Rev012
       module Show
-        include Rev011::Show
+        def defaults
+          {
+            'json'     => false,
+            'no-color' => false
+          }
+        end
+
+        def switches
+          %w[
+            json
+            no-color
+          ]
+        end
       end
     end
 
