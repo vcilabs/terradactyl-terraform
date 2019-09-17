@@ -2,6 +2,8 @@
 
 module Terradactyl
   module Terraform
+    class PlanFileParserError < RuntimeError; end
+
     module Rev012
       class PlanFileParser
         attr_reader :plan_path
@@ -28,7 +30,10 @@ module Terradactyl
           captured = Commands::Show.execute(dir_or_plan: plan_path,
                                             options: options,
                                             capture: true)
-          raise 'Error reading plan file!' unless captured.exitstatus.zero?
+
+          unless captured.exitstatus.zero?
+            raise PlanFileParserError.new('Error parsing plan file!')
+          end
 
           captured.stdout
         end
@@ -105,15 +110,13 @@ module Terradactyl
       WARN_NO_PLAN_OUTPUT = 'WARN: no plan output is available'
 
       def initialize(plan_path:, parser:)
+        @plan_path   = plan_path.to_s
         @parser      = parser
-        @file_name   = File.basename(plan_path)
-        @stack_name  = File.basename(plan_path, '.tfout')
-        @base_folder = File.dirname(plan_path).split('/')[-2]
+        @file_name   = File.basename(@plan_path)
+        @stack_name  = File.basename(@plan_path, '.tfout')
+        @base_folder = File.dirname(@plan_path).split('/')[-2]
 
-        parser.load(plan_path).tap do |dat|
-          @data     = dat.data
-          @checksum = dat.checksum
-        end
+        parse(@plan_path)
       end
 
       def save(artifact_path: artifact)
@@ -151,6 +154,15 @@ module Terradactyl
       end
 
       private
+
+      def parse(plan_path)
+        @parser.load(plan_path).tap do |dat|
+          @data     = dat.data
+          @checksum = dat.checksum
+        end
+      rescue PlanFileParserError => error
+        @data = error
+      end
 
       def artifact
         @artifact ||= File.join(ENV['TF_DATA_DIR'],

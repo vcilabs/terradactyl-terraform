@@ -90,6 +90,18 @@ RSpec.describe 'Working with Terraform PlanFiles' do
       let(:err_no_plan_output) { described_class::WARN_NO_PLAN_OUTPUT }
 
       context 'initialization' do
+        context 'when plan_path is a non-existent file' do
+          let(:parse_error) { Terradactyl::Terraform::PlanFileParserError }
+          let(:instance) do
+            described_class.new(plan_path: 'non-existent.tfout', parser: parser )
+          end
+
+          it 'rescues and captures a parse error' do
+            expect(instance).to be_a(described_class)
+            expect(instance.data).to be_a(parse_error)
+          end
+        end
+
         it 'loads and parses a terraform plan file' do
           expect(instance).to be_a(described_class)
           expect(instance).to respond_to(:checksum)
@@ -304,6 +316,18 @@ RSpec.describe 'Working with Terraform PlanFiles' do
       let(:err_no_plan_output) { described_class::WARN_NO_PLAN_OUTPUT }
 
       context 'initialization' do
+        context 'when plan_path is a non-existent file' do
+          let(:parse_error) { Terradactyl::Terraform::PlanFileParserError }
+          let(:instance) do
+            described_class.new(plan_path: 'non-existent.tfout', parser: parser )
+          end
+
+          it 'rescues and captures a parse error' do
+            expect(instance).to be_a(described_class)
+            expect(instance.data).to be_a(parse_error)
+          end
+        end
+
         it 'loads and parses a terraform plan file' do
           expect(instance).to be_a(described_class)
           expect(instance).to respond_to(:checksum)
