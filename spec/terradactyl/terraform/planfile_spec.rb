@@ -235,7 +235,7 @@ RSpec.describe 'Working with Terraform PlanFiles' do
       Terradactyl::Terraform::VersionManager.reset!
 
       @version       = '0.12.8'
-      @plan_checksum = '0ec0195a8329ba66f26c9651258235950c2d9612'
+      @plan_checksum = '19362d57c5403d040c4c304f5fe41e479aef20db'
       @options_init  = Commands::Options.new({quiet: true})
       @options_plan  = Commands::Options.new({
         quiet: true,

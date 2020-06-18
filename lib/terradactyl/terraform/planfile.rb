@@ -35,7 +35,19 @@ module Terradactyl
             raise PlanFileParserError.new('Error parsing plan file!')
           end
 
-          captured.stdout
+          return captured.stdout unless options.json
+
+          parsed = JSON.parse(captured.stdout)
+
+          # The the  `prior_state` node in the JSON returned from the
+          # planfile is not assembled consitently and therefore, never obeys
+          # any sort order. It does not appear to be of any consequence when
+          # calculating a checksum for the plan, so we excise it in an effort
+          # to conform the data. This is sub-optimal, but presently necessary.
+          #
+          # brian.warsing@visioncritical.com (2020-06-18)
+
+          parsed.reject { |k| k == 'prior_state' }.to_json
         end
 
         def options
