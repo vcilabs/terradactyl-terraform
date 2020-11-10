@@ -37,6 +37,12 @@ module Terradactyl
       end
     end
 
+    module Rev013
+      module Show
+        include Rev012::Show
+      end
+    end
+
     module Commands
       class Show < Base
       end

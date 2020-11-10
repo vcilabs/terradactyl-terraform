@@ -24,6 +24,12 @@ module Terradactyl
       end
     end
 
+    module Rev013
+      module Checklist
+        include Rev011::Checklist
+      end
+    end
+
     module Commands
       class Checklist < Base
       end
