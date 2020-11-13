@@ -39,12 +39,6 @@ module Terradactyl
       end
     end
 
-    module Rev013
-      module Init
-        include Rev011::Init
-      end
-    end
-
     module Commands
       class Init < Base
       end

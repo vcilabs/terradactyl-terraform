@@ -39,12 +39,6 @@ module Terradactyl
       end
     end
 
-    module Rev013
-      module Plan
-        include Rev011::Plan
-      end
-    end
-
     module Commands
       class Plan < Base
       end

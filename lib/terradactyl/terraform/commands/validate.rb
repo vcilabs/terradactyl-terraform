@@ -39,12 +39,6 @@ module Terradactyl
       end
     end
 
-    module Rev013
-      module Validate
-        include Rev012::Validate
-      end
-    end
-
     module Commands
       class Validate < Base
       end

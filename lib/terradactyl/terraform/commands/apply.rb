@@ -37,12 +37,6 @@ module Terradactyl
       end
     end
 
-    module Rev013
-      module Apply
-        include Rev011::Apply
-      end
-    end
-
     module Commands
       class Apply < Base
       end

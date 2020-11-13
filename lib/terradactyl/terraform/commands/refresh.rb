@@ -33,12 +33,6 @@ module Terradactyl
       end
     end
 
-    module Rev013
-      module Refresh
-        include Rev011::Refresh
-      end
-    end
-
     module Commands
       class Refresh < Base
       end

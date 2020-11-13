@@ -111,11 +111,6 @@ module Terradactyl
       end
     end
 
-    module Rev013
-      class PlanFileParser < Rev012::PlanFileParser
-      end
-    end
-
     class PlanFile
       def self.load(artifact_path: artifact)
         Marshal.load(File.read(artifact_path))

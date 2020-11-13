@@ -38,12 +38,6 @@ module Terradactyl
       end
     end
 
-    module Rev013
-      module Destroy
-        include Rev011::Destroy
-      end
-    end
-
     module Commands
       class Destroy < Base
       end

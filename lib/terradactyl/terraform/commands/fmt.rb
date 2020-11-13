@@ -25,12 +25,6 @@ module Terradactyl
       end
     end
 
-    module Rev013
-      module Fmt
-        include Rev011::Fmt
-      end
-    end
-
     module Commands
       class Fmt < Base
       end
