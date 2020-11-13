@@ -6,20 +6,15 @@ Gem::Specification.new do |spec|
   spec.name          = 'terradactyl-terraform'
   spec.version       = Terradactyl::Terraform::VERSION
   spec.authors       = ['Brian Warsing']
-  spec.email         = ['brian.warsing@visioncritical.com']
+  spec.email         = ['brian.warsing@alida.com']
   spec.summary       = %{Core functionality for managing a Terraform repo}
-  spec.homepage      = %{https://git.vcilabs.com/CloudEng/terradactyl-terraform}
+  spec.homepage      = %{https://github.com/vcilabs/terradactyl-terraform}
   spec.description   = <<~DESC
     A collection of libraries for executing Terraform CLI operations, managing
     Terraform binary versions, and other related tasks.
   DESC
 
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = 'http://gems.media.service.consul:8808'
-  else
-    raise 'RubyGems 2.0 or newer is required to protect against ' \
-      'public gem pushes.'
-  end
+  spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
   spec.required_ruby_version = '>= 2.5.0'
 
