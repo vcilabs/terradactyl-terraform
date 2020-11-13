@@ -63,7 +63,7 @@ module Terradactyl
         end
 
         def inventory_name_re
-          /(?:terraform-)(?<version>\d+\.\d+\.\d+)/
+          /(?:terraform-)(?<version>\d+\.\d+\.\d+(-\w+)?)/
         end
       end
     end

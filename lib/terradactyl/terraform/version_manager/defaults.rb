@@ -24,7 +24,7 @@ module Terradactyl
         end
 
         def version=(option)
-          @version = validate_semver(option) || DEFAULT_VERSION
+          @version = validate_semver_exp(option) || DEFAULT_VERSION
         end
 
         def install_dir=(option)
@@ -41,10 +41,13 @@ module Terradactyl
 
         private
 
-        def validate_semver(option)
-          return nil if option.to_s.empty?
+        def validate_semver_exp(option)
+          if data = option.to_s.match(SEMVER_EXP_RE)
+            return option if data['op']
+            return option if data['semver'].match(/\d+\.\d+\.\d+(-\w+)?/)
+          end
 
-          option.split('.').size == 3 ? option : nil
+          nil
         end
 
         def validate_path(option)

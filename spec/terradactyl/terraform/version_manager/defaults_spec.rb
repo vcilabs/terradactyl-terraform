@@ -88,7 +88,7 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
         expect(subject.version).to eq(version)
       end
       it 'ignores invalid strings' do
-        subject.version = '0.0'
+        subject.version = 'invalid'
         expect(subject.version).to eq(version)
       end
     end
