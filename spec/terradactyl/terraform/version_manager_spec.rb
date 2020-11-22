@@ -58,6 +58,78 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
     Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_RELEASES_URL
   end
 
+  describe '#current_version' do
+    before(:each) do
+      Terradactyl::Terraform::VersionManager.reset!
+    end
+
+    after(:each) do
+      Terradactyl::Terraform::VersionManager.reset!
+    end
+
+    let(:semver) { '0.11.14' }
+    let(:expver) { '~> 0.11.0' }
+    let(:maxver) { '0.11.15-oci' }
+
+    context 'when an explicit version is set' do
+      it 'returns it' do
+        Terradactyl::Terraform::VersionManager.version = semver
+        expect(subject.current_version).to eq(semver)
+      end
+    end
+
+    context 'when an expressed version is set' do
+      it 'returns the calculated version' do
+        Terradactyl::Terraform::VersionManager.version = expver
+        expect(subject.current_version).to eq(maxver)
+      end
+    end
+  end
+
+  describe '#versions' do
+    before(:all) do
+      @test_versions.each do |semver|
+        Terradactyl::Terraform::VersionManager.install(semver)
+      end
+    end
+
+    after(:all) do
+      @test_versions.each do |semver|
+        Terradactyl::Terraform::VersionManager.remove(semver)
+      end
+    end
+
+    let(:local_versions)  { subject.versions }
+    let(:remote_versions) { subject.versions(local: false) }
+
+    context 'when no options' do
+      it 'returns a list of locally installed versions' do
+        expect(local_versions).to be_a(Array)
+        expect(local_versions).to_not be_empty
+        expect(local_versions).to include(test_versions.first)
+        expect(local_versions).to include(test_versions.last)
+      end
+    end
+
+    context 'when passed option, local: true' do
+      it 'returns a list of locally installed versions' do
+        expect(local_versions).to be_a(Array)
+        expect(local_versions).to_not be_empty
+        expect(local_versions).to include(test_versions.first)
+        expect(local_versions).to include(test_versions.last)
+      end
+    end
+
+    context 'when passed option, local: false' do
+      it 'returns a list of locally installed versions' do
+        expect(remote_versions()).to be_a(Array)
+        expect(remote_versions).to_not be_empty
+        expect(remote_versions).to include(test_versions.first)
+        expect(remote_versions).to include(test_versions.last)
+      end
+    end
+  end
+
   describe '#latest' do
     it 'returns the very latest version of Terraform' do
       expect(subject.latest).to match(/\d\.\d{2}\.\d/)
