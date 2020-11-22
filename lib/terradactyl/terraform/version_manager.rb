@@ -17,10 +17,10 @@ module Terradactyl
 
       ERROR_MISSING                = 'Terraform not installed'
       ERROR_INVALID_VERSION_STRING = 'Invalid version string'
-      SEMVER_EXP_RE                = %r{
+      SEMVER_EXP_RE                = /
         ^\s*((?<op>(<=|>=|>|<|~>))\s+)?
         (?<semver>\d+(\.\d+)?(\.\d+)?(-\w+)?)
-      }x
+      /x.freeze
 
       @options   = Defaults.load
       @inventory = Inventory.load
@@ -44,7 +44,7 @@ module Terradactyl
           return inventory.validate(current_version) if version
           return inventory[inventory.latest] if inventory.any?
 
-          raise VersionManagerError.new(ERROR_MISSING)
+          raise VersionManagerError, ERROR_MISSING
         end
 
         def latest
@@ -69,18 +69,12 @@ module Terradactyl
 
         def versions(local: true)
           return inventory.versions if local
-          fh = Downloader.fetch(releases_url)
-          re = %r{terraform_(?<version>\d+\.\d+\.\d+(-\w+)?)}
-          fh.read.scan(re).flatten.sort_by { |v| Gem::Version.new(v) }
-        rescue
+
+          remote_versions
+        rescue StandardError
           warn "Failed to retrieve releases [#{releases_url}]"
           warn "Falling back to local inventory [#{install_dir}]"
           inventory.versions
-        ensure
-          if fh
-            fh.close
-            fh.unlink
-          end
         end
 
         def resolve(expression)
@@ -88,23 +82,33 @@ module Terradactyl
           op     = data['op']
           semver = data['semver']
 
-          resolution = case op
+          unless (resolution = resolve_expression(op, semver))
+            raise VersionManagerError, ERROR_INVALID_VERSION_STRING
+          end
+
+          resolution
+        end
+
+        private
+
+        def resolve_expression(op, semver)
+          case op
           when /~>/
             min = semver
             max = pessimistic_max(semver)
             versions(local: false).select { |v| (v >= min && v < max) }.last
           when />=|>|<=|</
-            versions(local: false).select { |v| (v.send(op.to_sym, semver)) }.last
+            versions(local: false).select { |v| v.send(op.to_sym, semver) }.last
           else
             versions(local: false).delete(semver)
           end
-
-          return resolution if resolution
-
-          raise VersionManagerError.new(ERROR_INVALID_VERSION_STRING)
         end
 
-        private
+        def remote_versions
+          fh = Downloader.fetch(releases_url)
+          re = /terraform_(?<version>\d+\.\d+\.\d+(-\w+)?)/
+          fh.read.scan(re).flatten.sort_by { |v| Gem::Version.new(v) }
+        end
 
         def pessimistic_max(version)
           max = version.split(/\.|-/).map(&:to_i)

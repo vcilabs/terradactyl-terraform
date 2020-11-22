@@ -6,19 +6,19 @@ module Terradactyl
       module Destroy
         def defaults
           {
-            'backup'       => nil,
+            'backup' => nil,
             'auto-approve' => false,
-            'force'        => false,
-            'lock'         => true,
+            'force' => false,
+            'lock' => true,
             'lock-timeout' => '0s',
-            'no-color'     => false,
-            'parallelism'  => 10,
-            'refresh'      => true,
-            'state'        => 'terraform.tfstate',
-            'state-out'    => nil,
+            'no-color' => false,
+            'parallelism' => 10,
+            'refresh' => true,
+            'state' => 'terraform.tfstate',
+            'state-out' => nil,
             # 'target'      => [], # not implemented
             # 'var'         => [], # not implemented
-            'var-file'     => nil
+            'var-file' => nil
           }
         end
 

@@ -6,19 +6,19 @@ module Terradactyl
       module Apply
         def defaults
           {
-            'backup'       => nil,
+            'backup' => nil,
             'auto-approve' => false,
-            'lock'         => true,
+            'lock' => true,
             'lock-timeout' => '0s',
-            'input'        => true,
-            'no-color'     => false,
-            'parallelism'  => 10,
-            'refresh'      => true,
-            'state'        => 'terraform.tfstate',
-            'state-out'    => nil,
+            'input' => true,
+            'no-color' => false,
+            'parallelism' => 10,
+            'refresh' => true,
+            'state' => 'terraform.tfstate',
+            'state-out' => nil,
             # 'target'      => [], # not implemented
             # 'var'         => [], # not implemented
-            'var-file'     => nil
+            'var-file' => nil
           }
         end
 

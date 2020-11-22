@@ -42,7 +42,7 @@ module Terradactyl
         private
 
         def validate_semver_exp(option)
-          if data = option.to_s.match(SEMVER_EXP_RE)
+          if (data = option.to_s.match(SEMVER_EXP_RE))
             return option if data['op']
             return option if data['semver'].match(/\d+\.\d+\.\d+(-\w+)?/)
           end

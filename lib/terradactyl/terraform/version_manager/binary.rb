@@ -56,7 +56,7 @@ module Terradactyl
         end
 
         def fetch
-          @download ||= @downloader.fetch(url: download_url)
+          @fetch ||= @downloader.fetch(url: download_url)
         end
 
         def validate_checksum
@@ -72,7 +72,7 @@ module Terradactyl
           base  = "#{releases_url}/#{version}/terraform_#{version}_SHA256SUMS"
           strio = URI.parse(base).open
           strio.readlines.inject({}) do |memo, line|
-            memo.merge!(Hash[*(line.split(/\s+/).reverse)])
+            memo.merge!(Hash[*line.split(/\s+/).reverse])
           end
         end
 

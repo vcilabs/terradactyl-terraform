@@ -7,9 +7,9 @@ module Terradactyl
         def defaults
           {
             'check-variables' => true,
-            'no-color'        => false,
+            'no-color' => false,
             # 'var'             => [], # not implemented
-            'var-file'        => nil,
+            'var-file' => nil
           }
         end
 
@@ -26,7 +26,7 @@ module Terradactyl
         def defaults
           {
             'no-color' => nil,
-            'json'     => nil,
+            'json' => nil
           }
         end
 

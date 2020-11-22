@@ -6,9 +6,9 @@ module Terradactyl
       module Fmt
         def defaults
           {
-            'list'  => true,
+            'list' => true,
             'write' => true,
-            'diff'  => false,
+            'diff' => false,
             'check' => false
           }
         end

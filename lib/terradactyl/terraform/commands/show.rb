@@ -7,7 +7,7 @@ module Terradactyl
         def defaults
           {
             'module-depth' => -1,
-            'no-color'     => false
+            'no-color' => false
           }
         end
 
@@ -23,7 +23,7 @@ module Terradactyl
       module Show
         def defaults
           {
-            'json'     => false,
+            'json' => false,
             'no-color' => false
           }
         end
