@@ -98,6 +98,7 @@ module Terradactyl
           end
           blob
         end
+        # rubocop:enable Security/Eval
 
         def normalize_line(line)
           if (caps = line.match(re_json_line))
@@ -117,6 +118,7 @@ module Terradactyl
         # rubocop:disable Security/MarshalLoad
         Marshal.load(File.read(artifact_path))
       end
+      # rubocop:enable Security/MarshalLoad
 
       attr_reader   :data, :checksum, :file_name, :stack_name
       attr_writer   :plan_output
