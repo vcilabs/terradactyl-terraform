@@ -6,20 +6,20 @@ module Terradactyl
       module Init
         def defaults
           {
-            'backend'        => true,
+            'backend' => true,
             'backend-config' => nil,
-            'from-module'    => nil,
-            'get'            => true,
-            'get-plugins'    => true,
-            'input'          => true,
-            'lock'           => true,
-            'lock-timeout'   => '0s',
-            'plugin-dir'     => nil,
-            'upgrade'        => false,
+            'from-module' => nil,
+            'get' => true,
+            'get-plugins' => true,
+            'input' => true,
+            'lock' => true,
+            'lock-timeout' => '0s',
+            'plugin-dir' => nil,
+            'upgrade' => false,
             'verify-plugins' => true,
-            'no-color'       => false,
-            'force-copy'     => false,
-            'reconfigure'    => false
+            'no-color' => false,
+            'force-copy' => false,
+            'reconfigure' => false
           }
         end
 

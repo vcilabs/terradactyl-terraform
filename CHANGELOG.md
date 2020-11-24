@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 0.13.0 (2020-11-23)
+
+NEW FEATURES:
+
+* adds support for Terraform version 0.13.x
+* adds expressive Terraform version management (i.e. pessimistic operator, ~> 0.12.1)
+* update Gem version string to match supported Terraform revision
+
+BUG FIXES:
+
+* fix/refactor/re-rog tests and update README
+
 ## 0.4.2 (2020-06-18)
 
 BUG FIXES:

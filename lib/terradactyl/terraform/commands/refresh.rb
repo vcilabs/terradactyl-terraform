@@ -6,16 +6,16 @@ module Terradactyl
       module Refresh
         def defaults
           {
-            'backup'       => nil,
-            'input'        => true,
-            'lock'         => true,
+            'backup' => nil,
+            'input' => true,
+            'lock' => true,
             'lock-timeout' => '0s',
-            'no-color'     => false,
-            'state'        => 'terraform.tfstate',
-            'state-out'    => nil,
+            'no-color' => false,
+            'state' => 'terraform.tfstate',
+            'state-out' => nil,
             # 'target'      => [], # not implemented
             # 'var'         => [], # not implemented
-            'var-file'     => nil
+            'var-file' => nil
           }
         end
 

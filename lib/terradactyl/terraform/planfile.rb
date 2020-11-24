@@ -32,7 +32,7 @@ module Terradactyl
                                             capture: true)
 
           unless captured.exitstatus.zero?
-            raise PlanFileParserError.new('Error parsing plan file!')
+            raise PlanFileParserError, 'Error parsing plan file!'
           end
 
           return captured.stdout unless options.json
@@ -92,17 +92,19 @@ module Terradactyl
 
         def normalize_json(blob)
           if blob.match(re_json_blob)
+            # rubocop:disable Security/Eval
             un_esc = eval(blob).chomp
             return JSON.parse(un_esc).deep_sort.to_json.inspect
           end
           blob
         end
+        # rubocop:enable Security/Eval
 
         def normalize_line(line)
           if (caps = line.match(re_json_line))
             blobs = caps['json'].split(' => ').map { |blob| normalize_json(blob) }
             blobs = blobs.join(' => ')
-            line  = [caps['attrib'], %(#{blobs})].join
+            line  = [caps['attrib'], blobs.to_s].join
           end
           line
         rescue JSON::ParserError
@@ -113,11 +115,14 @@ module Terradactyl
 
     class PlanFile
       def self.load(artifact_path: artifact)
+        # rubocop:disable Security/MarshalLoad
         Marshal.load(File.read(artifact_path))
       end
+      # rubocop:enable Security/MarshalLoad
 
       attr_reader   :data, :checksum, :file_name, :stack_name
-      attr_accessor :base_folder, :plan_output
+      attr_writer   :plan_output
+      attr_accessor :base_folder
 
       WARN_NO_PLAN_OUTPUT = 'WARN: no plan output is available'
 
@@ -172,8 +177,8 @@ module Terradactyl
           @data     = dat.data
           @checksum = dat.checksum
         end
-      rescue PlanFileParserError => error
-        @data = error
+      rescue PlanFileParserError => e
+        @data = e
       end
 
       def artifact

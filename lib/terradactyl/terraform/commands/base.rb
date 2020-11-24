@@ -4,7 +4,11 @@ module Terradactyl
   module Terraform
     class << self
       def revision(version)
-        version ? ['Rev', *version.split('.').take(2)].join : 'Rev011'
+        version ? ['Rev', *version.split(/\.|-/).take(2)].join : revisions.last
+      end
+
+      def revisions
+        contstants.select { |c| c =~ /Rev/ }.sort
       end
 
       def select_revision(version, object)
@@ -61,7 +65,7 @@ module Terradactyl
         end
 
         def version
-          File.basename(VersionManager.binary, '.exe').split('-').last
+          File.basename(VersionManager.binary, '.exe').split('terraform-').last
         end
 
         def environment
