@@ -39,7 +39,7 @@ jobs:
         with:
           tag_name: v${{ env.RELEASE_VERSION }}
           release_name: v${{ env.RELEASE_VERSION }}
-          body: ${{ env.RELEASE_BODY }}
+          body_path: ${{ env.RELEASE_BODY_PATH }}
           draft: false
           prerelease: false
       - name: Upload Asset
