@@ -5,6 +5,9 @@ on:
     paths:
       - '**.rb'
 
+# Using the Ruby teams https://github.com/ruby/setup-ruby, not the Github
+# team's https://github.com/actions/setup-ruby
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -14,14 +17,10 @@ jobs:
         with:
           fetch-depth: 2
       - name: Setup Ruby
-        uses: actions/setup-ruby@v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7'
           bundler-cache: true
-      - name: Bundle install
-        run: |
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
       - name: Run lint
         run: bundle exec rake lint
       - name: Run tests
