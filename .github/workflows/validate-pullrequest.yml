@@ -22,6 +22,8 @@ jobs:
           ruby-version: '2.7'
           bundler-cache: true
       - name: Run lint
+        id: lint
         run: bundle exec rake lint
       - name: Run tests
+        id: test
         run: bundle exec rake spec
