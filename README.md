@@ -1,6 +1,9 @@
 # Terradactyl::Terraform
 
-A collection of libraries for executing Terraform CLI operations, managing Terraform binary versions, and other related tasks.
+[![Gem Version](https://badge.fury.io/rb/terradactyl-terraform.svg)](https://badge.fury.io/rb/terradactyl-terraform)
+![Build Status](https://github.com/vcilabs/terradactyl-terraform/workflows/Build%20Status/badge.svg)
+
+Library for executing Terraform CLI operations, managing Terraform binary versions, and other related tasks.
 
 ## Requirements
 

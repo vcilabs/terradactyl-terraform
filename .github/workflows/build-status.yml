@@ -1,9 +1,9 @@
-name: Validate Pull Request
+name: Build Status
 
 on:
-  pull_request:
-    paths:
-      - '**.rb'
+  push:
+    branches:
+      - main
 
 # Using the Ruby teams https://github.com/ruby/setup-ruby, not the Github
 # team's https://github.com/actions/setup-ruby
@@ -21,9 +21,6 @@ jobs:
         with:
           ruby-version: '2.7'
           bundler-cache: true
-      - name: Run lint
-        id: lint
-        run: bundle exec rake lint
       - name: Run tests
         id: test
         run: bundle exec rake spec

@@ -7,6 +7,9 @@ on:
     paths:
       - lib/terradactyl/terraform/version.rb
 
+# Using the Ruby teams https://github.com/ruby/setup-ruby, not the Github
+# team's https://github.com/actions/setup-ruby
+
 jobs:
   release:
     env:
@@ -20,7 +23,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Setup Ruby
-        uses: actions/setup-ruby@v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7'
           bundler-cache: true
