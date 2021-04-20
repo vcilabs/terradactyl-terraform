@@ -27,7 +27,11 @@ module Terradactyl
         private
 
         def parse(plan_path)
-          captured = Commands::Show.execute(dir_or_plan: plan_path,
+          file_name  = File.basename(plan_path)
+          stack_name = File.dirname(plan_path)
+          pushd(stack_name)
+
+          captured = Commands::Show.execute(dir_or_plan: file_name,
                                             options: options,
                                             capture: true)
 
@@ -40,7 +44,7 @@ module Terradactyl
           parsed = JSON.parse(captured.stdout)
 
           # The the  `prior_state` node in the JSON returned from the
-          # planfile is not assembled consitently and therefore, never obeys
+          # planfile is not assembled consistently and therefore, never obeys
           # any sort order. It does not appear to be of any consequence when
           # calculating a checksum for the plan, so we excise it in an effort
           # to conform the data. This is sub-optimal, but presently necessary.
@@ -48,6 +52,8 @@ module Terradactyl
           # brian.warsing@visioncritical.com (2020-06-18)
 
           parsed.reject { |k| k == 'prior_state' }.to_json
+        ensure
+          popd
         end
 
         def options
@@ -56,6 +62,15 @@ module Terradactyl
             opts.no_color    = true unless ENV['TF_CLI_ARGS'] =~ /-no-color/
             opts.json        = true
           end
+        end
+
+        def pushd(path)
+          @working_dir_last = Dir.pwd
+          Dir.chdir(path)
+        end
+
+        def popd
+          Dir.chdir(@working_dir_last)
         end
       end
     end
