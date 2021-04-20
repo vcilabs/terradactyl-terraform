@@ -140,6 +140,7 @@ module Terradactyl
       attr_accessor :base_folder
 
       WARN_NO_PLAN_OUTPUT = 'WARN: no plan output is available'
+      PLAN_FILE_SIGNATURE = 'An execution plan has been generated and is shown below.'
 
       def initialize(plan_path:, parser:)
         @plan_path   = plan_path.to_s
@@ -204,14 +205,10 @@ module Terradactyl
       def format_output(string)
         return WARN_NO_PLAN_OUTPUT unless string
 
-        delimit = '-' * 72
-        content = string.split(delimit).compact.reject(&:empty?)
+        delimit   = '-' * 72
+        content   = string.split(delimit).compact.reject(&:empty?)
 
-        if content.size == 2
-          content.last.strip
-        else
-          content[content.size / 3].strip
-        end
+        content.select { |e| e =~ /#{PLAN_FILE_SIGNATURE}/ }.first
       end
     end
   end

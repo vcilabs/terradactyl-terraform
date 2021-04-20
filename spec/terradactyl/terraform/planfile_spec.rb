@@ -107,7 +107,7 @@ RSpec.describe 'Working with Terraform PlanFiles' do
         let(:instance) do
           described_class.new(plan_path: @plan_path, parser: parser )
         end
-        let(:plan_output) { 'some rando text' }
+        let(:plan_output) { described_class::PLAN_FILE_SIGNATURE }
         let(:err_no_plan_output) { described_class::WARN_NO_PLAN_OUTPUT }
 
         context 'initialization' do
@@ -154,7 +154,7 @@ RSpec.describe 'Working with Terraform PlanFiles' do
 
           context 'when EXPLICIT plan_output is present' do
             describe '#plan_output=' do
-              it 'accepts an arbitrary string as input' do
+              it 'accepts an signature string as input' do
                 instance.plan_output = plan_output
                 expect(instance.plan_output).to be_truthy
               end
