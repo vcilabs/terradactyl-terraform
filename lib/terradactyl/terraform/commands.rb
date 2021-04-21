@@ -15,7 +15,5 @@ require_relative 'commands/checklist'
 
 module Terradactyl
   module Terraform
-    Rev013 = Rev012.clone
-    Rev014 = Rev013.clone
   end
 end

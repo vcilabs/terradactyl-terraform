@@ -8,6 +8,8 @@ module Terradactyl
       class PlanFileParser
         attr_reader :plan_path
 
+        PLAN_FILE_SIGNATURE = 'An execution plan has been generated and is shown below.'
+
         def self.load(plan_path)
           new(plan_path)
         end
@@ -22,6 +24,10 @@ module Terradactyl
 
         def data
           @data ||= parse(@plan_path)
+        end
+
+        def signature
+          self.class::PLAN_FILE_SIGNATURE
         end
 
         private
@@ -72,6 +78,22 @@ module Terradactyl
         def popd
           Dir.chdir(@working_dir_last)
         end
+      end
+    end
+
+    module Rev013
+      class PlanFileParser < Rev012::PlanFileParser
+      end
+    end
+
+    module Rev014
+      class PlanFileParser < Rev012::PlanFileParser
+      end
+    end
+
+    module Rev015
+      class PlanFileParser < Rev012::PlanFileParser
+        PLAN_FILE_SIGNATURE = 'Terraform used the selected providers to generate the following execution'
       end
     end
 
@@ -135,21 +157,18 @@ module Terradactyl
       end
       # rubocop:enable Security/MarshalLoad
 
-      attr_reader   :data, :checksum, :file_name, :stack_name
-      attr_writer   :plan_output
+      attr_reader   :data, :checksum, :file_name, :stack_name, :parser
+      attr_writer   :plan_output, :error_output
       attr_accessor :base_folder
 
       WARN_NO_PLAN_OUTPUT = 'WARN: no plan output is available'
-      PLAN_FILE_SIGNATURE = 'An execution plan has been generated and is shown below.'
 
       def initialize(plan_path:, parser:)
         @plan_path   = plan_path.to_s
-        @parser      = parser
         @file_name   = File.basename(@plan_path)
         @stack_name  = File.basename(@plan_path, '.tfout')
         @base_folder = File.dirname(@plan_path).split('/')[-2]
-
-        parse(@plan_path)
+        @parser      = parse(parser, @plan_path)
       end
 
       def save(artifact_path: artifact)
@@ -166,7 +185,11 @@ module Terradactyl
       end
 
       def plan_output
-        format_output(@plan_output)
+        format_plan_output(@plan_output)
+      end
+
+      def error_output
+        format_error_output(@error_output)
       end
 
       def to_markdown
@@ -188,8 +211,8 @@ module Terradactyl
 
       private
 
-      def parse(plan_path)
-        @parser.load(plan_path).tap do |dat|
+      def parse(parser, plan_path)
+        parser.load(plan_path).tap do |dat|
           @data     = dat.data
           @checksum = dat.checksum
         end
@@ -202,13 +225,18 @@ module Terradactyl
                                 'terradactyl.planfile.data')
       end
 
-      def format_output(string)
+      def format_error_output(string)
+        string.strip
+      end
+
+      def format_plan_output(string)
         return WARN_NO_PLAN_OUTPUT unless string
 
-        delimit   = '-' * 72
-        content   = string.split(delimit).compact.reject(&:empty?)
+        # These hypens are different!
+        delimit = /(?:─|-){72,77}/
+        content = string.split(delimit).compact.reject(&:empty?)
 
-        content.select { |e| e =~ /#{PLAN_FILE_SIGNATURE}/ }.first
+        content.select { |e| e =~ /#{parser.signature}/ }.first.strip
       end
     end
   end

@@ -2,7 +2,7 @@
 
 module Terradactyl
   module Terraform
-    module Rev011
+    module Subcommands
       module Init
         def defaults
           {
@@ -33,9 +33,17 @@ module Terradactyl
       end
     end
 
-    module Rev012
+    module Rev015
       module Init
-        include Rev011::Init
+        include Terradactyl::Terraform::Subcommands::Init
+
+        def defaults
+          super.reject { |k,_v| k == 'lock' }
+        end
+
+        def arguments
+          super.reject { |k,_v| k == 'lock' }
+        end
       end
     end
 

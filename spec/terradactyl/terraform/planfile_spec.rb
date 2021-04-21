@@ -107,7 +107,7 @@ RSpec.describe 'Working with Terraform PlanFiles' do
         let(:instance) do
           described_class.new(plan_path: @plan_path, parser: parser )
         end
-        let(:plan_output) { described_class::PLAN_FILE_SIGNATURE }
+        let(:plan_output) { eval("#{parser}::PLAN_FILE_SIGNATURE") }
         let(:err_no_plan_output) { described_class::WARN_NO_PLAN_OUTPUT }
 
         context 'initialization' do

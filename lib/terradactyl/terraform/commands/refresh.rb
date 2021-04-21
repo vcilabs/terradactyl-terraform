@@ -2,7 +2,7 @@
 
 module Terradactyl
   module Terraform
-    module Rev011
+    module Subcommands
       module Refresh
         def defaults
           {
@@ -24,12 +24,6 @@ module Terradactyl
             no-color
           ]
         end
-      end
-    end
-
-    module Rev012
-      module Refresh
-        include Rev011::Refresh
       end
     end
 

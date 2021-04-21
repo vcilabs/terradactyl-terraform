@@ -2,7 +2,7 @@
 
 module Terradactyl
   module Terraform
-    module Rev011
+    module Subcommands
       module Apply
         def defaults
           {
@@ -28,12 +28,6 @@ module Terradactyl
             no-color
           ]
         end
-      end
-    end
-
-    module Rev012
-      module Apply
-        include Rev011::Apply
       end
     end
 

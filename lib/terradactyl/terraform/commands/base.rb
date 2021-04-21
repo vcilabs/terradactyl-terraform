@@ -13,10 +13,14 @@ module Terradactyl
 
       def select_revision(version, object)
         klass_name = object.class.name.split('::').last
-        const_name = "#{revision(version)}::#{klass_name}"
+        revision   = "#{revision(version)}::#{klass_name}"
         return if klass_name == 'Base'
 
-        object.extend(Terradactyl::Terraform.const_get(const_name))
+        if Terradactyl::Terraform.const_defined?(revision)
+          object.extend(Terradactyl::Terraform.const_get(revision))
+        else
+          object.extend(Terradactyl::Terraform.const_get("Subcommands::#{klass_name}"))
+        end
       end
     end
 

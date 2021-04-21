@@ -2,7 +2,7 @@
 
 module Terradactyl
   module Terraform
-    module Rev011
+    module Subcommands
       module Plan
         def defaults
           {
@@ -30,12 +30,6 @@ module Terradactyl
             no-color
           ]
         end
-      end
-    end
-
-    module Rev012
-      module Plan
-        include Rev011::Plan
       end
     end
 

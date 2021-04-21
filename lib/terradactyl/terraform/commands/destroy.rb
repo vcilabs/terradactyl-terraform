@@ -2,7 +2,7 @@
 
 module Terradactyl
   module Terraform
-    module Rev011
+    module Subcommands
       module Destroy
         def defaults
           {
@@ -32,9 +32,21 @@ module Terradactyl
       end
     end
 
-    module Rev012
+    module Rev015
       module Destroy
-        include Rev011::Destroy
+        include Terradactyl::Terraform::Subcommands::Destroy
+
+        def defaults
+          super.reject { |k,_v| k == 'force' }
+        end
+
+        def switches
+          super.reject { |e| e == 'force' }
+        end
+
+        def arguments
+          super.reject { |k,_v| k == 'force' }
+        end
       end
     end
 

@@ -2,24 +2,7 @@
 
 module Terradactyl
   module Terraform
-    module Rev011
-      module Show
-        def defaults
-          {
-            'module-depth' => -1,
-            'no-color' => false
-          }
-        end
-
-        def switches
-          %w[
-            no-color
-          ]
-        end
-      end
-    end
-
-    module Rev012
+    module Subcommands
       module Show
         def defaults
           {
@@ -31,6 +14,25 @@ module Terradactyl
         def switches
           %w[
             json
+            no-color
+          ]
+        end
+      end
+    end
+
+    module Rev011
+      include Terradactyl::Terraform::Subcommands::Show
+
+      module Show
+        def defaults
+          {
+            'module-depth' => -1,
+            'no-color' => false
+          }
+        end
+
+        def switches
+          %w[
             no-color
           ]
         end
