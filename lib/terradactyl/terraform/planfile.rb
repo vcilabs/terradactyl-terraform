@@ -8,7 +8,7 @@ module Terradactyl
       class PlanFileParser
         attr_reader :plan_path
 
-        PLAN_FILE_SIGNATURE = 'An execution plan has been generated and is shown below.'
+        PLAN_FILE_SIGNATURE = 'Terraform will perform the following actions'
 
         def self.load(plan_path)
           new(plan_path)
@@ -93,7 +93,6 @@ module Terradactyl
 
     module Rev015
       class PlanFileParser < Rev012::PlanFileParser
-        PLAN_FILE_SIGNATURE = 'Terraform used the selected providers to generate the following execution'
       end
     end
 
