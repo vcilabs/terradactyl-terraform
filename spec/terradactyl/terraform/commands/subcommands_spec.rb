@@ -400,24 +400,6 @@ RSpec.describe Terradactyl::Terraform::Commands do
           end
         end
       end
-
-      # describe Terradactyl::Terraform::Commands::Checklist do
-      #   let(:options) do
-      #     @options.new({
-      #       quiet: true,
-      #     })
-      #   end
-      #
-      #   let(:command) do
-      #     described_class.execute(dir_or_plan: @stack_dir, options: options)
-      #   end
-      #
-      #   describe '.execute' do
-      #     it 'performs a Terraform upgrade readiness check' do
-      #       expect(command).to eq(0)
-      #     end
-      #   end
-      # end
     end
   end
 end

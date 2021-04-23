@@ -11,7 +11,6 @@ require_relative 'commands/destroy'
 require_relative 'commands/fmt'
 require_relative 'commands/show'
 require_relative 'commands/validate'
-require_relative 'commands/checklist'
 
 module Terradactyl
   module Terraform
