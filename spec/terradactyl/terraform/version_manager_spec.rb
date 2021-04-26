@@ -5,11 +5,30 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
     @install_dir   = Terradactyl::Terraform::VersionManager.install_dir
     @test_versions = %w[0.11.14 0.12.2]
     @test_binaries = @test_versions.map { |v| "#{@install_dir}/terraform-#{v}" }
-    @expressed_versions = {
-      '~> 0.11.14' => 'eq("0.11.15-oci")',
-      '~> 0.11'    => 'be > "0.14"',
-      '>= 0.12'    => 'be >= "0.12"',
-      '< 0.12'     => 'be < "0.12"'
+    @valid_expressions = {
+      '>= 0.11.10'             => %{eq("#{terraform_latest}")},
+      '~> 0.11.10'             => 'eq("0.11.14")',
+      '~> 0.11.14'             => 'eq("0.11.14")',
+      '~> 0.11'                => 'be > "0.14"',
+      '>= 0.11.10, <= 0.11.14' => 'eq("0.11.14")',
+      '>= 0.11,    <= 0.12'    => 'eq("0.12.0")',
+      '>= 0.12'                => 'be >= "0.12"',
+      '< 0.12'                 => 'be < "0.12"',
+      '= 0.12.30'              => 'eq("0.12.30")',
+      '0.13.6'                 => 'eq("0.13.6")',
+    }
+
+    @invalid_expressions = {
+      '<= 0.12.10, >= 0.13.14' => %q{raise_error(version_manager_error, /#{unresolvable_version_error_msg}/)},
+      nil                      => %q{raise_error(version_manager_error, /#{invalid_version_error_msg}/)},
+      ''                       => %q{raise_error(version_manager_error, /#{invalid_version_error_msg}/)},
+      'foo'                    => %q{raise_error(version_manager_error, /#{invalid_version_error_msg}/)},
+      '0'                      => %q{raise_error(version_manager_error, /#{invalid_version_error_msg}/)},
+      '0.'                     => %q{raise_error(version_manager_error, /#{invalid_version_error_msg}/)},
+      '0.0'                    => %q{raise_error(version_manager_error, /#{invalid_version_error_msg}/)},
+      '~>'                     => %q{raise_error(version_manager_error, /#{unparseable_version_error_msg}/)},
+      '>'                      => %q{raise_error(version_manager_error, /#{unparseable_version_error_msg}/)},
+      '>='                     => %q{raise_error(version_manager_error, /#{unparseable_version_error_msg}/)},
     }
   end
 
@@ -38,13 +57,22 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
     Terradactyl::Terraform::VersionManager::ERROR_INVALID_VERSION_STRING
   end
 
+  let(:unresolvable_version_error_msg) do
+    Terradactyl::Terraform::VersionManager::ERROR_UNRESOLVABLE_VERSION
+  end
+
+  let(:unparseable_version_error_msg) do
+    Terradactyl::Terraform::VersionManager::ERROR_UNPARSEABLE_VERSION
+  end
+
   let(:inventory_error_missing) do
     Terradactyl::Terraform::VersionManager::Inventory::ERROR_VERSION_MISSING
   end
 
   let(:test_versions) { @test_versions }
   let(:test_binaries) { @test_binaries }
-  let(:expressed_versions) { @expressed_versions }
+  let(:valid_expressions) { @valid_expressions }
+  let(:invalid_expressions) { @invalid_expressions }
 
   let(:install_dir) do
     Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_INSTALL_DIR
@@ -73,15 +101,15 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
 
     context 'when an explicit version is set' do
       it 'returns it' do
-        Terradactyl::Terraform::VersionManager.version = semver
-        expect(subject.current_version).to eq(semver)
+        Terradactyl::Terraform::VersionManager.version = maxver
+        expect(subject.current_version).to eq(maxver)
       end
     end
 
     context 'when an expressed version is set' do
       it 'returns the calculated version' do
         Terradactyl::Terraform::VersionManager.version = expver
-        expect(subject.current_version).to eq(maxver)
+        expect(subject.current_version).to eq(semver)
       end
     end
   end
@@ -139,28 +167,15 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
   describe '#resolve' do
     context 'when passed a bad version expression' do
       it 'raises an exception' do
-        expect { subject.resolve(nil) }.to raise_error(
-          version_manager_error, /#{invalid_version_error_msg}/)
-        expect { subject.resolve('') }.to raise_error(
-          version_manager_error, /#{invalid_version_error_msg}/)
-        expect { subject.resolve('foo') }.to raise_error(
-          version_manager_error, /#{invalid_version_error_msg}/)
-        expect { subject.resolve('0') }.to raise_error(
-          version_manager_error, /#{invalid_version_error_msg}/)
-        expect { subject.resolve('0.') }.to raise_error(
-          version_manager_error, /#{invalid_version_error_msg}/)
-        expect { subject.resolve('0.0') }.to raise_error(
-          version_manager_error, /#{invalid_version_error_msg}/)
-        expect { subject.resolve('~>') }.to raise_error(
-          version_manager_error, /#{invalid_version_error_msg}/)
-        expect { subject.resolve('>') }.to raise_error(
-          version_manager_error, /#{invalid_version_error_msg}/)
+        invalid_expressions.each do |exp, test|
+          expect { subject.resolve(exp) }.to eval(test)
+        end
       end
     end
 
     context 'when passed a valid version expression' do
       it 'produces the expected version string' do
-        expressed_versions.each do |exp, test|
+        valid_expressions.each do |exp, test|
           expect(subject.resolve(exp)).to eval(test)
         end
       end
@@ -222,7 +237,7 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
 
         context 'when a version is expressed' do
           it 'installs the expressed version of Terraform' do
-            expressed_versions.each do |exp, test|
+            valid_expressions.each do |exp, test|
               res = Terradactyl::Terraform::VersionManager.resolve(exp)
               expect(subject.install(exp)).to be_truthy
               expect(File.exist?(subject[res])).to be_truthy
