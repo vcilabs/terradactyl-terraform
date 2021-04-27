@@ -11,8 +11,3 @@ require_relative 'commands/destroy'
 require_relative 'commands/fmt'
 require_relative 'commands/show'
 require_relative 'commands/validate'
-
-module Terradactyl
-  module Terraform
-  end
-end
