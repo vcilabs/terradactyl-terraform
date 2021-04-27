@@ -8,7 +8,7 @@ module Terradactyl
       end
 
       def revisions
-        contstants.select { |c| c =~ /Rev/ }.sort
+        constants.select { |c| c =~ /Rev/ }.sort
       end
 
       def select_revision(version, object)
