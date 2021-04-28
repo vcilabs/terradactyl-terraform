@@ -9,7 +9,7 @@ Library for executing Terraform CLI operations, managing Terraform binary versio
 
 Requires Ruby 2.5 or greater.
 
-NOTE: While `VersionManager` can fetch & install ANY available version of Terraform, the Terraform sub-command operations are only supported between stable versions `~> 0.11.x` and `~> 0.13.x`.
+NOTE: While `VersionManager` can fetch & install ANY available version of Terraform, the Terraform sub-command operations are only supported between stable versions `~> 0.11.x` and `~> 0.15.x`.
 
 ## Installation
 
@@ -35,7 +35,7 @@ If you wish to try out some features, launch a `pry` repl and poke around ...
 
     $ bundle exec pry -r 'terradactyl/terraform'
     [1] pry(main)> Terradactyl::Terraform::VERSION
-    => "0.13.0"
+    => "0.15.0"
 
 ### Managing  different Terraform versions
 
