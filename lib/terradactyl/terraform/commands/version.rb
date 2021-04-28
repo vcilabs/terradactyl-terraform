@@ -2,14 +2,8 @@
 
 module Terradactyl
   module Terraform
-    module Rev011
+    module Subcommands
       module Version
-      end
-    end
-
-    module Rev012
-      module Version
-        include Rev011::Version
       end
     end
 

@@ -8,6 +8,7 @@ require_relative 'version_manager/binary'
 
 module Terradactyl
   module Terraform
+    # rubocop:disable Metrics/ModuleLength
     module VersionManager
       class VersionManagerError < RuntimeError
         def initialize(msg)
@@ -17,8 +18,10 @@ module Terradactyl
 
       ERROR_MISSING                = 'Terraform not installed'
       ERROR_INVALID_VERSION_STRING = 'Invalid version string'
+      ERROR_UNRESOLVABLE_VERSION   = 'Unresolvable version string'
+      ERROR_UNPARSEABLE_VERSION    = 'Unparsable version string'
       SEMVER_EXP_RE                = /
-        ^\s*((?<op>(<=|>=|>|<|~>))\s+)?
+        ^\s*((?<op>(=|<=|>=|>|<|~>))\s+)?
         (?<semver>\d+(\.\d+)?(\.\d+)?(-\w+)?)
       /x.freeze
 
@@ -78,12 +81,8 @@ module Terradactyl
         end
 
         def resolve(expression)
-          data   = expression.to_s.match(SEMVER_EXP_RE) || {}
-          op     = data['op']
-          semver = data['semver']
-
-          unless (resolution = resolve_expression(op, semver))
-            raise VersionManagerError, ERROR_INVALID_VERSION_STRING
+          unless (resolution = resolve_expression(expression.to_s.strip))
+            raise VersionManagerError, ERROR_UNRESOLVABLE_VERSION
           end
 
           resolution
@@ -91,17 +90,63 @@ module Terradactyl
 
         private
 
-        def resolve_expression(op, semver)
-          case op
-          when /~>/
-            min = semver
-            max = pessimistic_max(semver)
-            versions(local: false).select { |v| (v >= min && v < max) }.last
-          when />=|>|<=|</
-            versions(local: false).select { |v| v.send(op.to_sym, semver) }.last
+        def resolve_expression(expression)
+          candiates = case expression
+                      when /^~>/
+                        resolve_pessimistic(expression)
+                      when /^(?:>=|>|<=|<)/
+                        resolve_range(expression)
+                      when /^(?:=\s+)?\d+\.\d+\.\d+(?:-.*)?/
+                        return resolve_equality(expression)
+                      else
+                        raise VersionManagerError, ERROR_INVALID_VERSION_STRING
+                      end
+
+          candiates.reject { |v| v =~ /-/ }.last
+        end
+
+        def resolve_equality(expression)
+          expression.split(/\s+/).last
+        end
+
+        # rubocop:disable Metrics/AbcSize
+        def resolve_range(expression)
+          left, right    = expression.split(/\s*,\s*/)
+          l_op, l_semver = parse_expression(left).captures
+
+          if right
+            r_op, r_semver = parse_expression(right).captures
           else
-            versions(local: false).delete(semver)
+            r_op = l_op
+            r_semver = l_semver
           end
+
+          l_gemver = Gem::Version.new(l_semver)
+          r_gemver = Gem::Version.new(r_semver)
+
+          versions(local: false).select do |v|
+            v = Gem::Version.new(v)
+            (v.send(l_op.to_sym, l_gemver) && v.send(r_op.to_sym, r_gemver))
+          end
+        end
+        # rubocop:enable Metrics/AbcSize
+
+        def resolve_pessimistic(expression)
+          semver    = parse_expression(expression).captures.last
+          min       = Gem::Version.new(semver)
+          max       = Gem::Version.new(pessimistic_max(semver))
+
+          versions(local: false).select do |v|
+            v = Gem::Version.new(v)
+            (v >= min && v < max)
+          end
+        end
+
+        def parse_expression(expression)
+          match = expression.to_s.match(SEMVER_EXP_RE)
+          raise VersionManagerError, ERROR_UNPARSEABLE_VERSION unless match
+
+          match
         end
 
         def remote_versions
@@ -127,5 +172,6 @@ module Terradactyl
         end
       end
     end
+    # rubocop:enable Metrics/ModuleLength
   end
 end

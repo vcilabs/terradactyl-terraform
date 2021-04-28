@@ -8,6 +8,8 @@ module Terradactyl
       class PlanFileParser
         attr_reader :plan_path
 
+        PLAN_FILE_SIGNATURE = 'Terraform will perform the following actions'
+
         def self.load(plan_path)
           new(plan_path)
         end
@@ -24,10 +26,19 @@ module Terradactyl
           @data ||= parse(@plan_path)
         end
 
+        def signature
+          self.class::PLAN_FILE_SIGNATURE
+        end
+
         private
 
+        # rubocop:disable Metrics/AbcSize
         def parse(plan_path)
-          captured = Commands::Show.execute(dir_or_plan: plan_path,
+          file_name  = File.basename(plan_path)
+          stack_name = File.dirname(plan_path)
+          pushd(stack_name)
+
+          captured = Commands::Show.execute(dir_or_plan: file_name,
                                             options: options,
                                             capture: true)
 
@@ -40,7 +51,7 @@ module Terradactyl
           parsed = JSON.parse(captured.stdout)
 
           # The the  `prior_state` node in the JSON returned from the
-          # planfile is not assembled consitently and therefore, never obeys
+          # planfile is not assembled consistently and therefore, never obeys
           # any sort order. It does not appear to be of any consequence when
           # calculating a checksum for the plan, so we excise it in an effort
           # to conform the data. This is sub-optimal, but presently necessary.
@@ -48,7 +59,10 @@ module Terradactyl
           # brian.warsing@visioncritical.com (2020-06-18)
 
           parsed.reject { |k| k == 'prior_state' }.to_json
+        ensure
+          popd
         end
+        # rubocop:enable Metrics/AbcSize
 
         def options
           Commands::Options.new do |opts|
@@ -57,6 +71,30 @@ module Terradactyl
             opts.json        = true
           end
         end
+
+        def pushd(path)
+          @working_dir_last = Dir.pwd
+          Dir.chdir(path)
+        end
+
+        def popd
+          Dir.chdir(@working_dir_last)
+        end
+      end
+    end
+
+    module Rev013
+      class PlanFileParser < Rev012::PlanFileParser
+      end
+    end
+
+    module Rev014
+      class PlanFileParser < Rev012::PlanFileParser
+      end
+    end
+
+    module Rev015
+      class PlanFileParser < Rev012::PlanFileParser
       end
     end
 
@@ -120,20 +158,18 @@ module Terradactyl
       end
       # rubocop:enable Security/MarshalLoad
 
-      attr_reader   :data, :checksum, :file_name, :stack_name
-      attr_writer   :plan_output
+      attr_reader   :data, :checksum, :file_name, :stack_name, :parser
+      attr_writer   :plan_output, :error_output
       attr_accessor :base_folder
 
       WARN_NO_PLAN_OUTPUT = 'WARN: no plan output is available'
 
       def initialize(plan_path:, parser:)
         @plan_path   = plan_path.to_s
-        @parser      = parser
         @file_name   = File.basename(@plan_path)
         @stack_name  = File.basename(@plan_path, '.tfout')
         @base_folder = File.dirname(@plan_path).split('/')[-2]
-
-        parse(@plan_path)
+        @parser      = parse(parser, @plan_path)
       end
 
       def save(artifact_path: artifact)
@@ -150,7 +186,11 @@ module Terradactyl
       end
 
       def plan_output
-        format_output(@plan_output)
+        format_plan_output(@plan_output)
+      end
+
+      def error_output
+        format_error_output(@error_output)
       end
 
       def to_markdown
@@ -172,8 +212,8 @@ module Terradactyl
 
       private
 
-      def parse(plan_path)
-        @parser.load(plan_path).tap do |dat|
+      def parse(parser, plan_path)
+        parser.load(plan_path).tap do |dat|
           @data     = dat.data
           @checksum = dat.checksum
         end
@@ -186,17 +226,18 @@ module Terradactyl
                                 'terradactyl.planfile.data')
       end
 
-      def format_output(string)
+      def format_error_output(string)
+        string.strip
+      end
+
+      def format_plan_output(string)
         return WARN_NO_PLAN_OUTPUT unless string
 
-        delimit = '-' * 72
+        # These hypens are different!
+        delimit = /(?:─|-){72,77}/
         content = string.split(delimit).compact.reject(&:empty?)
 
-        if content.size == 2
-          content.last.strip
-        else
-          content[content.size / 3].strip
-        end
+        content.select { |e| e =~ /#{parser.signature}/ }.first.strip
       end
     end
   end

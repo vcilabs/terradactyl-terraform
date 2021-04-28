@@ -1,7 +1,8 @@
 require_relative 'helpers'
 
-working_dir = File.dirname(__FILE__)
-FileUtils.cd(File.join(working_dir, 'fixtures'))
+working_dir  = File.dirname(__FILE__)
+$fixtures_dir = File.join(working_dir, 'fixtures')
+FileUtils.cd($fixtures_dir)
 
 require 'rspec_command'
 require 'pry'
