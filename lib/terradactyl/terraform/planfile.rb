@@ -32,6 +32,7 @@ module Terradactyl
 
         private
 
+        # rubocop:disable Metrics/AbcSize
         def parse(plan_path)
           file_name  = File.basename(plan_path)
           stack_name = File.dirname(plan_path)
@@ -61,6 +62,7 @@ module Terradactyl
         ensure
           popd
         end
+        # rubocop:enable Metrics/AbcSize
 
         def options
           Commands::Options.new do |opts|

@@ -8,6 +8,7 @@ require_relative 'version_manager/binary'
 
 module Terradactyl
   module Terraform
+    # rubocop:disable Metrics/ModuleLength
     module VersionManager
       class VersionManagerError < RuntimeError
         def initialize(msg)
@@ -108,6 +109,7 @@ module Terradactyl
           expression.split(/\s+/).last
         end
 
+        # rubocop:disable Metrics/AbcSize
         def resolve_range(expression)
           left, right    = expression.split(/\s*,\s*/)
           l_op, l_semver = parse_expression(left).captures
@@ -115,7 +117,8 @@ module Terradactyl
           if right
             r_op, r_semver = parse_expression(right).captures
           else
-            r_op, r_semver = l_op, l_semver
+            r_op = l_op
+            r_semver = l_semver
           end
 
           l_gemver = Gem::Version.new(l_semver)
@@ -126,6 +129,7 @@ module Terradactyl
             (v.send(l_op.to_sym, l_gemver) && v.send(r_op.to_sym, r_gemver))
           end
         end
+        # rubocop:enable Metrics/AbcSize
 
         def resolve_pessimistic(expression)
           semver    = parse_expression(expression).captures.last
@@ -141,6 +145,7 @@ module Terradactyl
         def parse_expression(expression)
           match = expression.to_s.match(SEMVER_EXP_RE)
           raise VersionManagerError, ERROR_UNPARSEABLE_VERSION unless match
+
           match
         end
 
@@ -167,5 +172,6 @@ module Terradactyl
         end
       end
     end
+    # rubocop:enable Metrics/ModuleLength
   end
 end

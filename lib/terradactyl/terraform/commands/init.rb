@@ -38,11 +38,11 @@ module Terradactyl
         include Terradactyl::Terraform::Subcommands::Init
 
         def defaults
-          super.reject { |k,_v| k == 'lock' }
+          super.reject { |k, _v| k == 'lock' }
         end
 
         def arguments
-          super.reject { |k,_v| k == 'lock' }
+          super.reject { |k, _v| k == 'lock' }
         end
       end
     end

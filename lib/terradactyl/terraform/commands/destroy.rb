@@ -37,7 +37,7 @@ module Terradactyl
         include Terradactyl::Terraform::Subcommands::Destroy
 
         def defaults
-          super.reject { |k,_v| k == 'force' }
+          super.reject { |k, _v| k == 'force' }
         end
 
         def switches
@@ -45,7 +45,7 @@ module Terradactyl
         end
 
         def arguments
-          super.reject { |k,_v| k == 'force' }
+          super.reject { |k, _v| k == 'force' }
         end
       end
     end
