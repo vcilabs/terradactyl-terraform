@@ -7,8 +7,7 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
     @test_binaries = @test_versions.map { |v| "#{@install_dir}/terraform-#{v}" }
     @valid_expressions = {
       '>= 0.11.10'             => %{eq("#{terraform_latest}")},
-      '~> 0.11.10'             => 'eq("0.11.14")',
-      '~> 0.11.14'             => 'eq("0.11.14")',
+      '~> 0.11.10'             => 'match(/0\.11\.\d+/)',
       '~> 0.11'                => 'be > "0.14"',
       '>= 0.11.10, <= 0.11.14' => 'eq("0.11.14")',
       '>= 0.11,    <= 0.12'    => 'eq("0.12.0")',
@@ -95,8 +94,8 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
       Terradactyl::Terraform::VersionManager.reset!
     end
 
-    let(:semver) { '0.11.14' }
-    let(:expver) { '~> 0.11.0' }
+    let(:semver) { '0.11.15' }
+    let(:expver) { '= 0.11.15' }
     let(:maxver) { '0.11.15-oci' }
 
     context 'when an explicit version is set' do
