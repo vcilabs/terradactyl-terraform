@@ -50,6 +50,12 @@ module Terradactyl
       end
     end
 
+    module Rev1_00
+      module Destroy
+        include Terradactyl::Terraform::Rev015::Destroy
+      end
+    end
+
     module Commands
       class Destroy < Base
       end

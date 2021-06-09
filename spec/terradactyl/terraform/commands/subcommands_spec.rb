@@ -6,7 +6,7 @@ RSpec.describe Terradactyl::Terraform::Commands do
       before(:all) do
         Dir.chdir($fixtures_dir)
 
-        @version    = info[:version]
+        @version    = resolve_version(info[:version])
         @options    = Terradactyl::Terraform::Commands::Options
         @stack_name = rev
         @stack_dir  = "stacks/#{@stack_name}"

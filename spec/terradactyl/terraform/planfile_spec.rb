@@ -6,7 +6,7 @@ RSpec.describe 'Working with Terraform PlanFiles' do
   Helpers.terraform_test_matrix.each do |rev, info|
     context "when binary is Terraform #{info[:version]}" do
       before(:all) do
-        @version    = info[:version]
+        @version    = resolve_version(info[:version])
         @options    = Terradactyl::Terraform::Commands::Options
         @stack_name = rev
         @stack_dir  = "stacks/#{@stack_name}"

@@ -3,8 +3,15 @@
 module Terradactyl
   module Terraform
     class << self
+      def calc_revision(version)
+        major, minor = version.split(/\.|-/).take(2)
+        major = major.to_i.zero? ? major : major + '_'
+        minor = minor.rjust(2, '0') # pad a single digit
+        ['Rev', major, minor].join
+      end
+
       def revision(version)
-        version ? ['Rev', *version.split(/\.|-/).take(2)].join : revisions.last
+        version ? calc_revision(version) : revisions.last
       end
 
       def revisions
