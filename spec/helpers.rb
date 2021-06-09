@@ -19,7 +19,7 @@ module Helpers
           plan_checksum: '15b03b347551cc56b1cf0f69c61329d957790bf6',
           artifacts: {
             init:    '.terraform',
-            plan:    "rev012.tfout",
+            plan:    'rev012.tfout',
             apply:   'terraform.tfstate',
             refresh: 'terraform.tfstate.backup',
             destroy: 'terraform.tfstate.backup',
@@ -31,7 +31,7 @@ module Helpers
           plan_checksum: 'f5df851473542cac1d40dd045f92901bb59c827a',
           artifacts: {
             init:    '.terraform',
-            plan:    "rev013.tfout",
+            plan:    'rev013.tfout',
             apply:   'terraform.tfstate',
             refresh: 'terraform.tfstate',
             destroy: 'terraform.tfstate',
@@ -44,7 +44,7 @@ module Helpers
           artifacts: {
             init:    '.terraform',
             lock:    '.terraform.lock.hcl',
-            plan:    "rev014.tfout",
+            plan:    'rev014.tfout',
             apply:   'terraform.tfstate',
             refresh: 'terraform.tfstate',
             destroy: 'terraform.tfstate',
@@ -57,7 +57,20 @@ module Helpers
           artifacts: {
             init:    '.terraform',
             lock:    '.terraform.lock.hcl',
-            plan:    "rev015.tfout",
+            plan:    'rev015.tfout',
+            apply:   'terraform.tfstate',
+            refresh: 'terraform.tfstate',
+            destroy: 'terraform.tfstate',
+            lint:    'unlinted.tf',
+          }
+        },
+        rev1_00: {
+          version: '~> 1.0.0',
+          plan_checksum: '0bd24348ff74045ee166f5928a0ea980aeba07ab',
+          artifacts: {
+            init:    '.terraform',
+            lock:    '.terraform.lock.hcl',
+            plan:    'rev1_00.tfout',
             apply:   'terraform.tfstate',
             refresh: 'terraform.tfstate',
             destroy: 'terraform.tfstate',
@@ -98,5 +111,9 @@ module Helpers
 
   def terraform_latest
     Terradactyl::Terraform::VersionManager.latest
+  end
+
+  def resolve_version(exp)
+    Terradactyl::Terraform::VersionManager.resolve(exp)
   end
 end

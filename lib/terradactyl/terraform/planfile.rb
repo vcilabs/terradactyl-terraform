@@ -98,6 +98,11 @@ module Terradactyl
       end
     end
 
+    module Rev1_00
+      class PlanFileParser < Rev012::PlanFileParser
+      end
+    end
+
     module Rev011
       class PlanFileParser < Rev012::PlanFileParser
         def checksum

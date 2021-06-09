@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.0.0 (2021-06-09)
+
+NEW FEATURES:
+
+* add support for Terraform version `~> 1.0.0`
+
+BUG FIXES:
+
+* fix broken version revision resolution
+
 ## 0.15.0 (2021-04-27)
 
 NEW FEATURES:

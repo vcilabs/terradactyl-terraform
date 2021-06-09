@@ -47,6 +47,12 @@ module Terradactyl
       end
     end
 
+    module Rev1_00
+      module Init
+        include Terradactyl::Terraform::Rev015::Init
+      end
+    end
+
     module Commands
       class Init < Base
       end

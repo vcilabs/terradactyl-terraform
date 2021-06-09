@@ -159,7 +159,7 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
 
   describe '#latest' do
     it 'returns the very latest version of Terraform' do
-      expect(subject.latest).to match(/\d\.\d{2}\.\d/)
+      expect(subject.latest).to match(/\d+\.\d+\.\d+/)
     end
   end
 

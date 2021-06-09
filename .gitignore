@@ -11,3 +11,7 @@ vendor
 
 # rspec failure tracking
 .rspec_status
+
+# terraform artifacts
+*.tfout
+.terraform
