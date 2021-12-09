@@ -65,8 +65,8 @@ module Helpers
           }
         },
         rev1_00: {
-          version: '~> 1.0.0',
-          plan_checksum: '0bd24348ff74045ee166f5928a0ea980aeba07ab',
+          version: '1.0.11',
+          plan_checksum: '4f706dc6e0b9a7c5a4ecc31f34d879f18f49f28f',
           artifacts: {
             init:    '.terraform',
             lock:    '.terraform.lock.hcl',
@@ -77,6 +77,20 @@ module Helpers
             lint:    'unlinted.tf',
           }
         },
+        rev1_01: {
+          version: '~> 1.1.0',
+          plan_checksum: 'c3767566118abc9d237024034d0aebcbaf63d1f3',
+          artifacts: {
+            init:    '.terraform',
+            lock:    '.terraform.lock.hcl',
+            plan:    'rev1_01.tfout',
+            apply:   'terraform.tfstate',
+            refresh: 'terraform.tfstate',
+            destroy: 'terraform.tfstate',
+            lint:    'unlinted.tf',
+          }
+        },
+
       }
     end
   end
