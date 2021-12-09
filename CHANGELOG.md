@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.1.0 (2021-12-09)
+
+NEW FEATURES:
+
+* add support for Terraform version `~> 1.1.0`
+* Update lib/terradactyl/terraform/commands/destroy.rb (add Rev1_01)
+* Update lib/terradactyl/terraform/commands/init.rb (add Rev1_01)
+* Update spec/fixtures/stacks (add rev1_01)
+* Update spec/helpers.rb (add rev1_01 and lock rev1_00 to 1.0.11)
+
 ## 1.0.0 (2021-06-09)
 
 NEW FEATURES:
