@@ -51,12 +51,6 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Package do
     end
   end
 
-  describe '#downloads_url' do
-    it 'returns the base URL for fetchable packages' do
-      expect(subject.downloads_url).to eq(Terradactyl::Terraform::VersionManager.downloads_url)
-    end
-  end
-
   describe '#releases_url' do
     it 'returns the Terraform downloadlanding page URL' do
       expect(subject.releases_url).to eq(Terradactyl::Terraform::VersionManager.releases_url)

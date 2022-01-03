@@ -4,16 +4,15 @@ module Terradactyl
   module Terraform
     module VersionManager
       class Defaults
-        DEFAULT_INSTALL_DIR   = Gem.bindir
-        DEFAULT_DOWNLOADS_URL = 'https://www.terraform.io/downloads.html'
-        DEFAULT_RELEASES_URL  = 'https://releases.hashicorp.com/terraform'
-        DEFAULT_VERSION       = nil
+        DEFAULT_INSTALL_DIR  = Gem.bindir
+        DEFAULT_RELEASES_URL = 'https://releases.hashicorp.com/terraform'
+        DEFAULT_VERSION      = nil
 
         def self.load
           new
         end
 
-        attr_reader :version, :install_dir, :downloads_url, :releases_url
+        attr_reader :version, :install_dir, :releases_url
 
         def initialize
           load_defaults
@@ -29,10 +28,6 @@ module Terradactyl
 
         def install_dir=(option)
           @install_dir = validate_path(option) || DEFAULT_INSTALL_DIR
-        end
-
-        def downloads_url=(option)
-          @downloads_url = validate_url(option) || DEFAULT_DOWNLOADS_URL
         end
 
         def releases_url=(option)
@@ -66,7 +61,6 @@ module Terradactyl
 
         def load_defaults
           @install_dir   = DEFAULT_INSTALL_DIR
-          @downloads_url = DEFAULT_DOWNLOADS_URL
           @releases_url  = DEFAULT_RELEASES_URL
           @version       = DEFAULT_VERSION
         end

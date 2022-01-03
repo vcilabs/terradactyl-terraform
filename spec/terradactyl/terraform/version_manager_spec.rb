@@ -77,10 +77,6 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
     Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_INSTALL_DIR
   end
 
-  let(:downloads_url) do
-    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_DOWNLOADS_URL
-  end
-
   let(:releases_url) do
     Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_RELEASES_URL
   end
@@ -346,7 +342,6 @@ RSpec.describe Terradactyl::Terraform::VersionManager do
 
     it 'responds to requests for options' do
       expect(subject.install_dir).to eq(install_dir)
-      expect(subject.downloads_url).to eq(downloads_url)
       expect(subject.releases_url).to eq(releases_url)
     end
 
