@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.1.2 (2022-01-03)
+
+BUG FIXES:
+
+* fix calculation of latest version
+* fix failing tests
+
 ## 1.1.0 (2021-12-09)
 
 NEW FEATURES:
