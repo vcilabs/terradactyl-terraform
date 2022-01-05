@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.1.3 (2022-01-05)
+
+BUG FIXES:
+
+* Add back `download_url` def block
+
 ## 1.1.2 (2022-01-03)
 
 BUG FIXES:

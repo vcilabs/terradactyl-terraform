@@ -36,6 +36,10 @@ module Terradactyl
           end
         end
 
+        def downloads_url
+          VersionManager.downloads_url
+        end
+
         def releases_url
           VersionManager.releases_url
         end
