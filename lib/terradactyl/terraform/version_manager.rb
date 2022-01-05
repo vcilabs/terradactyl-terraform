@@ -31,8 +31,7 @@ module Terradactyl
       class << self
         extend Forwardable
 
-        def_delegators :@options, :version, :version=, :install_dir,
-                       :install_dir=, :downloads_url, :downloads_url=,
+        def_delegators :@options, :version, :version=, :install_dir, :install_dir=,
                        :releases_url, :releases_url=, :reset!
 
         def_delegators :@inventory, :[], :binaries, :any?
@@ -153,6 +152,9 @@ module Terradactyl
           fh = Downloader.fetch(releases_url)
           re = /terraform_(?<version>\d+\.\d+\.\d+(-\w+)?)/
           fh.read.scan(re).flatten.sort_by { |v| Gem::Version.new(v) }
+        ensure
+          fh.close
+          fh.unlink
         end
 
         def pessimistic_max(version)
@@ -163,12 +165,7 @@ module Terradactyl
         end
 
         def calculate_latest
-          fh = Downloader.fetch(downloads_url)
-          re = %r{#{releases_url}\/(?<version>\d+\.\d+\.\d+)}
-          fh.read.match(re)['version']
-        ensure
-          fh.close
-          fh.unlink
+          remote_versions.reject { |e| e =~ /\d+\.\d+\.\d+-/ }.last
         end
       end
     end

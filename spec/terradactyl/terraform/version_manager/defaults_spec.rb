@@ -23,10 +23,6 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
     Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_INSTALL_DIR
   end
 
-  let(:downloads_url) do
-    Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_DOWNLOADS_URL
-  end
-
   let(:releases_url) do
     Terradactyl::Terraform::VersionManager::Defaults::DEFAULT_RELEASES_URL
   end
@@ -49,12 +45,6 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
     describe '#install_dir' do
       it 'returns the default value' do
         expect(subject.install_dir).to eq(install_dir)
-      end
-    end
-
-    describe '#downloads_url' do
-      it 'returns the default value' do
-        expect(subject.downloads_url).to eq(downloads_url)
       end
     end
 
@@ -110,21 +100,6 @@ RSpec.describe Terradactyl::Terraform::VersionManager::Defaults do
         subject.install_dir = '~/'
         expect(subject.install_dir).not_to eq('~/')
         expect(subject.install_dir).to eq(File.expand_path('~/'))
-      end
-    end
-
-    describe '#downloads_url=' do
-      it 'ignores empty values' do
-        subject.downloads_url = ''
-        expect(subject.downloads_url).to eq(downloads_url)
-      end
-      it 'ignores nil values' do
-        subject.downloads_url = nil
-        expect(subject.downloads_url).to eq(downloads_url)
-      end
-      it 'ignores invalid url values' do
-        subject.downloads_url = 'some/garbage/path'
-        expect(subject.downloads_url).to eq(downloads_url)
       end
     end
 

@@ -78,8 +78,8 @@ module Helpers
           }
         },
         rev1_01: {
-          version: '~> 1.1.0',
-          plan_checksum: 'c3767566118abc9d237024034d0aebcbaf63d1f3',
+          version: '1.1.2',
+          plan_checksum: '3d2c2f48370010196e402894d90b516af5953fd0',
           artifacts: {
             init:    '.terraform',
             lock:    '.terraform.lock.hcl',
@@ -90,7 +90,6 @@ module Helpers
             lint:    'unlinted.tf',
           }
         },
-
       }
     end
   end
