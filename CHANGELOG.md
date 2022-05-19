@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.2.0 (2022-05-18)
+
+NEW FEATURES:
+
+* add support for Terraform version `~> 1.2.0`
+* Update lib/terradactyl/terraform/commands/destroy.rb (add Rev1_02)
+* Update lib/terradactyl/terraform/commands/init.rb (add Rev1_02)
+* Update spec/fixtures/stacks (add rev1_02)
+* Update spec/helpers.rb (add rev1_02)
+
 ## 1.1.2 (2022-01-03)
 
 BUG FIXES:
