@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 1.2.1 (2022-06-13)
+
+BUG FIX:
+
+* differentiate between `arm` and `arm64` architectures
+  * fixes binary downloader on Apple silicon
+
+MISCELLANEOUS: 
+
+* Add `.DS_Store` to `.gitignore`
+
 ## 1.2.0 (2022-05-18)
 
 NEW FEATURES:
