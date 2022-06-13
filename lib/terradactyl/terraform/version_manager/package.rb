@@ -10,8 +10,10 @@ module Terradactyl
             'amd64'
           when /i?86|x86|i86pc/
             '386'
-          when /^arm/
+          when /^arm$/
             'arm'
+          when /^arm64/
+            'arm64'
           else
             raise "FATAL: Unsupported CPU arch, #{value}"
           end
