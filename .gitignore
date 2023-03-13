@@ -15,4 +15,5 @@ vendor
 
 # terraform artifacts
 *.tfout
+*.tfstate.backup
 .terraform

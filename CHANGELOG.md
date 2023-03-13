@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.4.0 (2023-03-13)
+
+NEW FEATURES:
+
+* add support for Terraform version `~> 1.4.0`
+* update init, planfile, and destroy commands (add Rev1_04)
+* add Rev1_04 rspecs
+
 ## 1.3.0 (2022-09-21)
 
 NEW FEATURES:
