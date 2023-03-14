@@ -14,6 +14,7 @@ RSpec.describe Terradactyl::Terraform::Commands do
         @artifacts.each_pair { |_k,v| FileUtils.rm_rf(v) if File.exist?(v) }
 
         ENV['TF_PLUGIN_CACHE_DIR'] = File.expand_path('~/.terraform.d/plugins')
+        ENV['TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE'] = 'true'
 
         Terradactyl::Terraform::VersionManager.version = @version
         Terradactyl::Terraform::VersionManager.install
