@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.4.1 (2023-03-21)
+
+BUG FIX:
+
+* support `aarch64` architectures
+
 ## 1.4.0 (2023-03-13)
 
 NEW FEATURES:

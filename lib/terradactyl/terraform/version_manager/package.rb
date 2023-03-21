@@ -12,7 +12,7 @@ module Terradactyl
             '386'
           when /^arm$/
             'arm'
-          when /^arm64/
+          when /^arm64|aarch64/
             'arm64'
           else
             raise "FATAL: Unsupported CPU arch, #{value}"
