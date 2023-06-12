@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.5.0 (2023-06-12)
+
+NEW FEATURES:
+
+* add support for Terraform version `~> 1.5.0`
+* exclude `timestamp` from PlanFileParser to maintain consistent checksums
+* update init, planfile, and destroy commands (add Rev1_05)
+* add Rev1_05 rspecs
+
 ## 1.4.1 (2023-03-21)
 
 BUG FIX:
@@ -11,6 +20,7 @@ BUG FIX:
 NEW FEATURES:
 
 * add support for Terraform version `~> 1.4.0`
+* set `TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE` to true
 * update init, planfile, and destroy commands (add Rev1_04)
 * add Rev1_04 rspecs
 

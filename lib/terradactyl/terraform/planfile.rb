@@ -58,7 +58,12 @@ module Terradactyl
           #
           # brian.warsing@visioncritical.com (2020-06-18)
 
+          # The same must be done to the `timestamp` node introduced in TF 1.5
+          #
+          # lisa.li@alida.com (2023-06-12)
+
           parsed.reject { |k| k == 'prior_state' }.to_json
+          parsed.reject { |k| k == 'timestamp' }.to_json
         ensure
           popd
         end
@@ -119,6 +124,11 @@ module Terradactyl
     end
 
     module Rev1_04
+      class PlanFileParser < Rev012::PlanFileParser
+      end
+    end
+
+    module Rev1_05
       class PlanFileParser < Rev012::PlanFileParser
       end
     end
