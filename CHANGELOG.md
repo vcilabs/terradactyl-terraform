@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.6.0 (2023-10-04)
+* add support for Terraform version `~> 1.6.0`
+* update init, planfile, and destroy commands (add Rev1_06)
+* add Rev1_06 rspecs
+
 ## 1.5.0 (2023-06-12)
 
 NEW FEATURES:
@@ -39,7 +44,7 @@ BUG FIX:
 * differentiate between `arm` and `arm64` architectures
   * fixes binary downloader on Apple silicon
 
-MISCELLANEOUS: 
+MISCELLANEOUS:
 
 * Add `.DS_Store` to `.gitignore`
 
