@@ -142,6 +142,19 @@ module Helpers
             lint:    'unlinted.tf',
           }
         },
+        rev1_06: {
+          version: '1.6.0',
+          plan_checksum: '1369a4d666a2e73402313ba117b0a6d3ae1f82b9',
+          artifacts: {
+            init:    '.terraform',
+            lock:    '.terraform.lock.hcl',
+            plan:    'rev1_06.tfout',
+            apply:   'terraform.tfstate',
+            refresh: 'terraform.tfstate',
+            destroy: 'terraform.tfstate',
+            lint:    'unlinted.tf',
+          }
+        },
       }
     end
   end
