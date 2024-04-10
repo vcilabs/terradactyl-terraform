@@ -1,8 +1,13 @@
 # CHANGELOG
 
+## 1.8.0 (2025-04-10)
+* add support for Terraform version `~> 1.8.0`
+* update init, planfile, and destroy commands (add Rev1_08)
+* add Rev1_08 rspecs
+
 ## 1.7.0 (2024-01-17)
-* add support for Terraform version `~> 1.r76.0`
-* update init, planfile, and destroy commands (add Rev1_0r76)
+* add support for Terraform version `~> 1.7.0`
+* update init, planfile, and destroy commands (add Rev1_07)
 * add Rev1_07 rspecs
 
 ## 1.6.0 (2023-10-04)
