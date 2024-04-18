@@ -4,7 +4,7 @@ module Terradactyl
   module Terraform
     module VersionManager
       module Package
-        def architecture
+        def architecture(version = nil)
           case value = RbConfig::CONFIG['host_cpu'].downcase
           when /amd64|x86_64/
             'amd64'
@@ -13,7 +13,11 @@ module Terradactyl
           when /^arm$/
             'arm'
           when /^arm64|aarch64/
-            'arm64'
+            if version != nil && version.start_with?('0.')
+              'amd64' # fall back to amd64 because no arm64 releases for TF versions < 1.0
+            else
+              'arm64'
+            end
           else
             raise "FATAL: Unsupported CPU arch, #{value}"
           end

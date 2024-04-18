@@ -1,16 +1,27 @@
 # CHANGELOG
 
+## 1.8.1 (2025-04-17)
+NEW FEATURES:
+* add support for using latest Terraform 1.x minor version without an explicit implementation
+* update init, planfile, and destroy commands (add Rev1_latest)
+
+BUG FIX:
+* fix downloading TF versions < 1.0 on `arm64` architectures
+
 ## 1.8.0 (2025-04-10)
+NEW FEATURES:
 * add support for Terraform version `~> 1.8.0`
 * update init, planfile, and destroy commands (add Rev1_08)
 * add Rev1_08 rspecs
 
 ## 1.7.0 (2024-01-17)
+NEW FEATURES:
 * add support for Terraform version `~> 1.7.0`
 * update init, planfile, and destroy commands (add Rev1_07)
 * add Rev1_07 rspecs
 
 ## 1.6.0 (2023-10-04)
+NEW FEATURES:
 * add support for Terraform version `~> 1.6.0`
 * update init, planfile, and destroy commands (add Rev1_06)
 * add Rev1_06 rspecs

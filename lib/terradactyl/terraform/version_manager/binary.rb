@@ -81,7 +81,7 @@ module Terradactyl
         end
 
         def archive_file
-          "terraform_#{version}_#{platform}_#{architecture}.zip"
+          "terraform_#{version}_#{platform}_#{architecture(version)}.zip"
         end
 
         def download_url
