@@ -13,7 +13,7 @@ module Terradactyl
           when /^arm$/
             'arm'
           when /^arm64|aarch64/
-            if version != nil && version.start_with?('0.')
+            if !version.nil? && version.start_with?('0.')
               'amd64' # fall back to amd64 because no arm64 releases for TF versions < 1.0
             else
               'arm64'

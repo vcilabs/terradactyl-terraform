@@ -20,7 +20,7 @@ module Terradactyl
             @fh   = URI.parse(url).open
             @path = @fh.path
           rescue OpenURI::HTTPError => e
-            puts "Can't access #{ url }", e.message
+            puts "Can't access #{url}", e.message
           end
           @fh
         end
