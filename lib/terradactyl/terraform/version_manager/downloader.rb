@@ -16,8 +16,12 @@ module Terradactyl
         end
 
         def fetch(url: self.url)
-          @fh   = URI.parse(url).open
-          @path = @fh.path
+          begin
+            @fh   = URI.parse(url).open
+            @path = @fh.path
+          rescue OpenURI::HTTPError => e
+            puts "Can't access #{url}", e.message
+          end
           @fh
         end
 

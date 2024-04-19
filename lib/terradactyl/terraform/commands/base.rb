@@ -6,7 +6,7 @@ module Terradactyl
       def calc_revision(version)
         major, minor = version.split(/\.|-/).take(2)
         major = major.to_i.zero? ? major : major + '_'
-        minor = minor.rjust(2, '0') # pad a single digit
+        minor = minor.nil? ? 'latest' : minor.rjust(2, '0') # pad a single digit unless not provided
         ['Rev', major, minor].join
       end
 
