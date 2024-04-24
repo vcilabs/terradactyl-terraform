@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.8.2 (2025-04-24)
+BUG FIX:
+* fix unzipping TF versions > 1.8.2 (breaking distribution change [details](https://github.com/hashicorp/terraform/blob/v1.8.2/CHANGELOG.md#182-april-24-2024))
+
 ## 1.8.1 (2025-04-17)
 NEW FEATURES:
 * add support for using latest Terraform 1.x minor version without an explicit implementation
