@@ -7,6 +7,7 @@ module Terradactyl
         include Package
 
         ERROR_CHECKSUM = 'FATAL: Calculated sum does not match published value!'
+        TERRAFORM_FILENAME = 'terraform'
 
         attr_accessor :version
 
@@ -52,7 +53,11 @@ module Terradactyl
         private
 
         def unzip(src, dst)
-          Zip::File.open(src) { |arch| arch.each { |f| f.extract(dst) } }
+          Zip::File.open(src) do |arch|
+            arch.each do |f|
+              f.extract(dst) if f.name.include?(TERRAFORM_FILENAME)
+            end
+          end
         end
 
         def fetch
